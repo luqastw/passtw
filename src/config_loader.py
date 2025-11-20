@@ -2,24 +2,30 @@ import json
 from src.paths import CONFIG_FILE
 from src.preferences import Preferences
 
+def ensure_config():
+    if not CONFIG_FILE.exists():
+        default = Preferences()
+        CONFIG_FILE.write_text(json.dumps(default.__dict__, indent=4))
+        print("Configuration file not found. Creating default...")
+        return default
+
 def read_preferences():
+    ensure_config()
     raw_json = CONFIG_FILE.read_text()
     data = json.loads(raw_json)
     return Preferences(
-        use_upper=data["use_upper"], 
-        use_lower=data["use_lower"],
-        use_nums=data["use_nums"],
-        use_sims=data["use_sims"],
-        length=data["length"]    
+        upper=data["upper"], 
+        lower=data["lower"],
+        nums=data["nums"],
+        sims=data["sims"]
     )
 
 def save_preferences(prefs: Preferences):
     data = {
-        "length": prefs.length,
-        "use_upper": prefs.use_upper,
-        "use_lower": prefs.use_lower,
-        "use_digits": prefs.use_digits,
-        "use_symbols": prefs.use_symbols
+        "upper": prefs.upper,
+        "lower": prefs.lower,
+        "nums": prefs.nums,
+        "sims": prefs.sims
     }
 
     json_string = json.dumps(data, indent=4)
