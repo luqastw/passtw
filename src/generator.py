@@ -1,11 +1,8 @@
 from src.paths import CONFIG_FILE
 from src.preferences import Preferences
 from src.config_loader import read_preferences
-from cryptography import fernet
 from typing import Dict
-import secrets
-import string
-import random
+import secrets, string, random
 
 PASSWORD = []
 CHAR_POOL = {}
@@ -17,8 +14,8 @@ BASE_POOL = {
     "sims": string.punctuation
 }
 
-def build_pool(prefs: Preferences):
-    data = read_preferences(prefs)
+def build_pool():
+    data = read_preferences()
 
     if data.upper is True: CHAR_POOL["upper"] = BASE_POOL["upper"]
     if data.lower is True: CHAR_POOL["lower"] = BASE_POOL["lower"]
@@ -26,8 +23,8 @@ def build_pool(prefs: Preferences):
     if data.sims is True: CHAR_POOL["sims"] = BASE_POOL["sims"]
     return CHAR_POOL
 
-def pick_chars(pool: Dict):
-    for i in pool.values():
+def pick_chars():
+    for i in CHAR_POOL.values():
         PASSWORD.append(secrets.choice(i))
     return PASSWORD
 
@@ -49,8 +46,8 @@ def secure_shuffle(seq):
 
     return seq
     
-build_pool(CONFIG_FILE)
-pick_chars(CHAR_POOL)
+build_pool()
+pick_chars()
 fill_with_random()
 PASSWORD = secure_shuffle(PASSWORD)
 finalpass = ''.join(PASSWORD)
