@@ -1,4 +1,4 @@
-from src.config_loader import read_preferences
+from src.config_loader import ConfigurationManager
 from src.crypto_manager import crypt_generated, CryptoManager
 import string, secrets
 
@@ -11,7 +11,8 @@ class PasswordGenerator():
         self.config = self._load_config()
 
     def _load_config(self):
-        config = read_preferences()
+        manager = ConfigurationManager()
+        config = manager.read_preferences()
         return config
 
     def _build_pool(self):
