@@ -1,6 +1,6 @@
 from src.config_loader import read_preferences
-from src.crypto_manager import crypt_generated
-import string, random, secrets
+from src.crypto_manager import crypt_generated, CryptoManager
+import string, secrets
 
 class PasswordGenerator():
     PASSWORD = []
@@ -54,7 +54,11 @@ class PasswordGenerator():
         self._fill_random()
         return self._secure_shuffle()
 
-def create_password(name):
+def create_password(name: str):
     generator = PasswordGenerator()
-    password = generator.generate()
-    return crypt_generated(name, password)
+    generated_password = generator.generate()
+    return crypt_generated(name, generated_password)
+
+def get_password(name: str):
+    manager = CryptoManager()
+    return manager.read_password(name)

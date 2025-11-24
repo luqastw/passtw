@@ -31,8 +31,11 @@ class CryptoManager():
         else:
             self.data = {}
 
-        self.data[name] = self.str_token
-        VAULT_FILE.write_text(json.dumps(self.data, indent=4))
+        if name in self.data:
+            raise FileExistsError("This password already exists.")
+        else:
+            self.data[name] = self.str_token
+            VAULT_FILE.write_text(json.dumps(self.data, indent=4))
 
     def _read_from_vault(self, name: str) -> str:
         if not VAULT_FILE.exists():
@@ -46,7 +49,7 @@ class CryptoManager():
             raise ValueError("Password not found.")
 
         self.token_bytes = self.token_str.encode()
-        return decrypt_password(self.token_bytes)
+        return self._decrypt_password(self.token_bytes)
 
     def _password_encrypt(self, name, password):
         encrypted_password = self._encrypt_password(password)
@@ -58,7 +61,6 @@ class CryptoManager():
     def read_password(self, name):
         return self._read_from_vault(name)
 
-    
 def crypt_generated(name, password):
     manager = CryptoManager()
-    manager.crypt_password(name, password)
+    return manager.crypt_password(name, password)
