@@ -7,7 +7,8 @@ def ensure_config():
         default = Preferences()
         CONFIG_FILE.write_text(json.dumps(default.__dict__, indent=4))
         print("Configuration file not found. Creating default...")
-        return default
+        
+    return CONFIG_FILE
 
 def read_preferences():
     ensure_config()

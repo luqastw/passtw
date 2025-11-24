@@ -1,54 +1,60 @@
-from src.paths import CONFIG_FILE
-from src.preferences import Preferences
 from src.config_loader import read_preferences
-from typing import Dict
-import secrets, string, random
+import string, random, secrets
 
-PASSWORD = []
-CHAR_POOL = {}
+class PasswordGenerator():
+    PASSWORD = []
+    CHAR_POOL = {}
+    ALL_CHARS = ''
 
-BASE_POOL = {
-    "upper": string.ascii_uppercase,
-    "lower": string.ascii_lowercase,
-    "nums": string.digits,
-    "sims": string.punctuation
-}
+    def __init__(self):
+        self.config = self._load_config()
 
-def build_pool():
-    data = read_preferences()
+    def _load_config(self):
+        config = read_preferences()
+        return config
 
-    if data.upper is True: CHAR_POOL["upper"] = BASE_POOL["upper"]
-    if data.lower is True: CHAR_POOL["lower"] = BASE_POOL["lower"]
-    if data.nums is True: CHAR_POOL["nums"] = BASE_POOL["nums"]
-    if data.sims is True: CHAR_POOL["sims"] = BASE_POOL["sims"]
-    return CHAR_POOL
+    def _build_pool(self):
+        self._load_config()
+        if self.config.upper:
+            self.CHAR_POOL["upper"] = string.ascii_uppercase
+        if self.config.lower:
+            self.CHAR_POOL["lower"] = string.ascii_lowercase
+        if self.config.nums:
+            self.CHAR_POOL["nums"] = string.digits
+        if self.config.sims:
+            self.CHAR_POOL["sims"] = string.punctuation
 
-def pick_chars():
-    for i in CHAR_POOL.values():
-        PASSWORD.append(secrets.choice(i))
-    return PASSWORD
+        return self.CHAR_POOL
 
-def fill_with_random():
-    ALL_CHARS = "".join(CHAR_POOL.values())
-    remaining = 16 - len(PASSWORD)
+    def _pick_chars(self):
+        for i in self.CHAR_POOL.values():
+            self.PASSWORD.append(secrets.choice(i))
+            return self.PASSWORD
 
-    for _ in range(remaining):
-        PASSWORD.append(secrets.choice(ALL_CHARS))
+    def _fill_random(self):
+        self.ALL_CHARS = "".join(self.CHAR_POOL.values())
+        remaining = 16 - len(self.PASSWORD)
 
-    print(PASSWORD)
+        for _ in range(remaining):
+            self.PASSWORD.append(secrets.choice(self.ALL_CHARS))
 
-def secure_shuffle(seq):
-    seq = list(seq)
+    def _secure_shuffle(self):
+        self.seq = list(self.PASSWORD)
 
-    for i in range(len(seq) - 1, 0, -1):
-        j = secrets.randbelow(i + 1)
-        seq[i], seq[j] = seq[j], seq[i]
+        for i in range(len(self.seq) - 1, 0, -1):
+            j = secrets.randbelow(i + 1)
+            self.seq[i], self.seq[j] = self.seq[j], self.seq[i]
 
-    return seq
-    
-build_pool()
-pick_chars()
-fill_with_random()
-PASSWORD = secure_shuffle(PASSWORD)
-finalpass = ''.join(PASSWORD)
-print(finalpass)
+        return ''.join(self.seq)
+
+    def generate(self):
+        self._build_pool()
+        self._pick_chars()
+        self._fill_random()
+        return self._secure_shuffle()
+
+def create_password():
+    generator = PasswordGenerator()
+    return generator.generate()
+
+print(create_password())
