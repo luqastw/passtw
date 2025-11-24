@@ -54,7 +54,7 @@ class PasswordGenerator():
         self._fill_random()
         return self._secure_shuffle()
 
-def create_password():
+def create_password(name):
     generator = PasswordGenerator()
     password = generator.generate()
-    return crypt_generated("fulano", password)
+    return crypt_generated(name, password)
