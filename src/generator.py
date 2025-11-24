@@ -1,4 +1,5 @@
 from src.config_loader import read_preferences
+from src.crypto_manager import crypt_generated
 import string, random, secrets
 
 class PasswordGenerator():
@@ -55,6 +56,5 @@ class PasswordGenerator():
 
 def create_password():
     generator = PasswordGenerator()
-    return generator.generate()
-
-print(create_password())
+    password = generator.generate()
+    return crypt_generated("fulano", password)
