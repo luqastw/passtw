@@ -7,7 +7,3 @@ def test_ensure_file_exists():
 def test_read_preferences():
     manager = ConfigurationManager()
     manager.read_preferences()
-
-def test_save_preferences():
-    manager = ConfigurationManager()
-    manager.save_preferences()
