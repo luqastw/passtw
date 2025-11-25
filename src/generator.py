@@ -1,14 +1,14 @@
 from src.config_loader import ConfigurationManager
 from src.crypto_manager import crypt_generated, CryptoManager
+from src.preferences import Preferences
 import string, secrets
 
 class PasswordGenerator():
-    PASSWORD = []
-    CHAR_POOL = {}
-    ALL_CHARS = ''
-
     def __init__(self):
         self.config = self._load_config()
+        self.PASSWORD = []
+        self.CHAR_POOL = {}
+        self.ALL_CHARS = ''
 
     def _load_config(self):
         manager = ConfigurationManager()
@@ -16,7 +16,8 @@ class PasswordGenerator():
         return config
 
     def _build_pool(self):
-        self._load_config()
+        self.CHAR_POOL = {}
+
         if self.config.upper:
             self.CHAR_POOL["upper"] = string.ascii_uppercase
         if self.config.lower:
@@ -29,9 +30,9 @@ class PasswordGenerator():
         return self.CHAR_POOL
 
     def _pick_chars(self):
-        for i in self.CHAR_POOL.values():
-            self.PASSWORD.append(secrets.choice(i))
-            return self.PASSWORD
+        for chars in self.CHAR_POOL.values():
+            self.PASSWORD.append(secrets.choice(chars))
+        secrets.SystemRandom().shuffle(self.PASSWORD)
 
     def _fill_random(self):
         self.ALL_CHARS = "".join(self.CHAR_POOL.values())
@@ -41,13 +42,11 @@ class PasswordGenerator():
             self.PASSWORD.append(secrets.choice(self.ALL_CHARS))
 
     def _secure_shuffle(self):
-        self.seq = list(self.PASSWORD)
-
-        for i in range(len(self.seq) - 1, 0, -1):
+        for i in range(len(self.PASSWORD) - 1, 0, -1):
             j = secrets.randbelow(i + 1)
-            self.seq[i], self.seq[j] = self.seq[j], self.seq[i]
+            self.PASSWORD[i], self.PASSWORD[j] = self.PASSWORD[j], self.PASSWORD[i]
 
-        return ''.join(self.seq)
+        return ''.join(self.PASSWORD)
 
     def generate(self):
         self._build_pool()
