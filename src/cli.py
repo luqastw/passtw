@@ -24,11 +24,6 @@ def generate(name):
     click.echo(f"Password '{name}' created.")
 
 @passtw.command()
-def set_upper():
-    """Activate ascii upper characters."""
-    set_config_value("upper", True)
-
-@passtw.command()
 @click.argument("options", nargs=-1)
 def set(options):
     """Activate characters."""
