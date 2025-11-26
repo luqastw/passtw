@@ -7,8 +7,7 @@ class ConfigurationManager():
         if not CONFIG_FILE.exists():
             default = Preferences()
             CONFIG_FILE.write_text(json.dumps(default.__dict__, indent=4))
-            print("Configuration file not found. Creating default...") 
-
+            
         return CONFIG_FILE
 
     def read_preferences(self):
