@@ -1,7 +1,16 @@
 [project]
-name = "src"
+name = "passtw"
 version = "0.1.0"
-dependencies = []
+dependencies = [
+    "click",
+    "cryptography",
+]
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.setuptools.package-dir]
+src = "src"
 
 [project.scripts]
 passtw = "src.cli:passtw"
