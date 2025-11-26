@@ -12,6 +12,17 @@ def set_config_value(key: str, value: bool):
 
     return CONFIG_FILE.write_text(json.dumps(config, indent=4))
 
+def set_all_values(value: bool):
+    manager = ConfigurationManager()
+    manager._ensure_config()
+    config = json.loads(CONFIG_FILE.read_text())
+    config["upper"] = value
+    config["lower"] = value
+    config["nums"] = value
+    config["sims"] = value
+
+    return CONFIG_FILE.write_text(json.dumps(config, indent=4))
+
 @click.group()
 def passtw():
     """Command line interface of passtw."""
@@ -27,8 +38,15 @@ def generate(name):
 @click.argument("options", nargs=-1)
 def set(options):
     """Activate characters."""
+    config_data = json.loads(CONFIG_FILE.read_text())
+
     for option in options:
-        if option in options:
+        if option == "all":
+            set_all_values(True)
+            click.echo("all chars activated.")
+            break
+
+        if option in config_data:
             set_config_value(option, True)
             click.echo(f"{option} activated.")
         else:
@@ -38,8 +56,15 @@ def set(options):
 @click.argument("options", nargs=-1)
 def unset(options):
     """Disable characters."""
+    config_data = json.loads(CONFIG_FILE.read_text())
+
     for option in options:
-        if option in option:
+        if option == "all":
+            set_all_values(False)
+            click.echo("all chars disabled.")
+            break
+
+        if option in config_data:
             set_config_value(option, False)
             click.echo(f"{option} disabled.")
         else:
