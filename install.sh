@@ -5,7 +5,7 @@ detect_system() {
 
     case "$os" in
         Linux)   echo "Linux" ;;
-        Darwin)  echo "MacOs" ;;
+        Darwin)  echo "MacOS" ;;
         *)       echo "Windows" ;;
     esac
 }
@@ -32,7 +32,7 @@ echo "
 echo ""
 echo "Choose your operational system:"
 echo "[ 1 ] Linux"
-echo "[ 2 ] MacOs"
+echo "[ 2 ] MacOS"
 echo "[ 3 ] Windows"
 read -p "> " option
 
@@ -40,7 +40,7 @@ REAL_OS=$(detect_system)
 
 case "$option" in
     1) USER_OS="Linux" ;;
-    2) USER_OS="MacOs" ;;
+    2) USER_OS="MacOS" ;;
     3) USER_OS="Windows" ;;
     *)
         clear

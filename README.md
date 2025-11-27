@@ -36,14 +36,14 @@ passtw is a secure, minimalistic, and configurable command-line tool for generat
 
 ## 🚀 Features
 
-* Generate secure random passwords
-* Encrypted local vault storage (AES-128)
-* Configuration of password policies (length, character classes)
-* Key generation and rotation
-* CLI-based usage with multiple commands
-* Cross-platform support (Linux / macOS / Windows)
-* Clean project structure (`src/`, `tests/`)
-* Automated tests for reliability
+* Generate secure random passwords;
+* Encrypted local vault storage (AES-128);
+* Configuration of password policies (character classes);
+* Key generation and rotation;
+* CLI-based usage with multiple commands;
+* Cross-platform support (Linux / macOS / Windows);
+* Clean project structure (`src/`, `tests/`);
+* Automated tests for reliability.
 
 ---
 
@@ -62,7 +62,6 @@ passtw is a secure, minimalistic, and configurable command-line tool for generat
 ```bash
 git clone https://github.com/luqastw/passtw.git
 cd passtw
-pip install -r requirements.txt
 sh install.sh
 ```
 
@@ -71,7 +70,6 @@ sh install.sh
 ```powershell
 git clone https://github.com/luqastw/passtw.git
 cd passtw
-pip install -r requirements.txt
 ./install.ps1
 ```
 
@@ -159,22 +157,22 @@ All critical modules including password generation, encryption/decryption, and c
 
 ## 🗺 Roadmap / Planned Features
 
-* Multiple vaults / profiles for different projects
-* Secure backup / export of vault
-* Interactive TUI interface with enhanced UX
-* Integration with clipboard for secure password copy
-* Password strength estimation and recommendations
-* Packaging and release via PyPI
+* Multiple vaults / profiles for different projects;
+* Secure backup / export of vault;
+* Interactive TUI interface with enhanced UX;
+* Integration with clipboard for secure password copy;
+* Password strength estimation and recommendations;
+* Packaging and release via PyPI.
 
 ---
 
 ## 👨‍💻 Contribution
 
-* Fork the repository
-* Create a feature branch (`git checkout -b feature/my-feature`)
-* Commit your changes (`git commit -m 'Add new feature'`)
-* Push to branch (`git push origin feature/my-feature`)
-* Open a Pull Request
+* Fork the repository;
+* Create a feature branch (`git checkout -b feature/my-feature`);
+* Commit your changes (`git commit -m 'Add new feature'`);
+* Push to branch (`git push origin feature/my-feature`);
+* Open a Pull Request.
 
 Please follow the existing code style and write tests for new features.
 
