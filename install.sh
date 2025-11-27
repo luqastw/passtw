@@ -4,9 +4,9 @@ detect_system() {
     local os="$(uname -s)"
 
     case "$os" in
-        Linux)   echo "linux" ;;
-        Darwin)  echo "macos" ;;
-        *)       echo "windows" ;;
+        Linux)   echo "Linux" ;;
+        Darwin)  echo "MacOs" ;;
+        *)       echo "Windows" ;;
     esac
 }
 
@@ -24,7 +24,7 @@ run_silent() {
 }
 
 clear
-echo "                                                                                                                                                                                          
+echo "
 ▐▀▘ ▜▘▙ ▌▞▀▖▀▛▘▞▀▖▌  ▌  ▞▀▖▀▛▘▜▘▞▀▖▙ ▌ ▀▜ 
 ▐   ▐ ▌▌▌▚▄  ▌ ▙▄▌▌  ▌  ▙▄▌ ▌ ▐ ▌ ▌▌▌▌  ▐ 
 ▐   ▐ ▌▝▌▖ ▌ ▌ ▌ ▌▌  ▌  ▌ ▌ ▌ ▐ ▌ ▌▌▝▌  ▐ 
@@ -39,12 +39,13 @@ read -p "> " option
 REAL_OS=$(detect_system)
 
 case "$option" in
-    1) USER_OS="linux" ;;
-    2) USER_OS="macos" ;;
-    3) USER_OS="windows" ;;
+    1) USER_OS="Linux" ;;
+    2) USER_OS="MacOs" ;;
+    3) USER_OS="Windows" ;;
     *)
         clear
         echo "[ ✖ ] Invalid option. Please choose 1, 2, or 3."
+        echo ""
         exit 1
         ;;
 esac
