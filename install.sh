@@ -78,23 +78,30 @@ case "$option" in
             PY=python
         else
             kill "$LOADER_PID" >/dev/null 2>&1
+            printf "\r%-40s\r" 
             echo "[ ✖ ] Python not found."
             exit 1
         fi
 
-        echo "[ ✓ ] Python founded."
-        EXTRA="--break-system-packages"
-
-        loader "[ 2 ] Updating pip" &
-        LOADER_PID=$!
-        run_silent $PY pip install --upgrade pip $EXTRA
-        kill "$LOADER_PID" >/dev/null 2>&1
         printf "\r%-40s\r" 
-        echo "[ ✓ ] pip updated."
+        echo "[ ✓ ] Python found."
+
+        loader "[ 2 ] Detecting pipx" &
+        LOADER_PID=$!
+        if run_silent command -v pipx; then
+            kill "$LOADER_PID" >/dev/null 2>&1
+            printf "\r%-40s\r" 
+            echo "[ ✓ ] pipx found."
+        else
+            kill "$LOADER_PID" >/dev/null 2>&1
+            printf "\r%-40s\r" 
+            echo "[ ✖ ] pipx not found."
+            exit 1
+        fi
 
         loader "[ 3 ] Installing passtw" &
         LOADER_PID=$!
-        run_silent $PY pip install --editable . $EXTRA
+        run_silent pipx install .
         kill "$LOADER_PID" >/dev/null 2>&1
         clear
 
@@ -135,18 +142,24 @@ case "$option" in
         fi
 
         printf "\r%-40s\r" 
-        echo "[ ✓ ] Python founded."
+        echo "[ ✓ ] Python found."
 
-        loader "[ 2 ] Updating pip" &
+        loader "[ 2 ] Detecting pipx" &
         LOADER_PID=$!
-        run_silent pip install --upgrade pip
-        kill "$LOADER_PID" >/dev/null 2>&1
-        printf "\r%-40s\r" 
-        echo "[ ✓ ] pip updated."
+        if run_silent command -v pipx; then
+            kill "$LOADER_PID" >/dev/null 2>&1
+            printf "\r%-40s\r" 
+            echo "[ ✓ ] pipx found."
+        else
+            kill "$LOADER_PID" >/dev/null 2>&1
+            printf "\r%-40s\r" 
+            echo "[ ✖ ] pipx not found."
+            exit 1
+        fi
 
         loader "[ 3 ] Installing passtw" &
         LOADER_PID=$!
-        run_silent pip install --editable .
+        run_silent pipx install .
         kill "$LOADER_PID" >/dev/null 2>&1
         clear
 
