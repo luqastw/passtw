@@ -185,7 +185,7 @@ case "$option" in
 ▐   ▌▝▌▌ ▌ ▌  ▌ ▌▝▞ ▌ ▌▐ ▌  ▌ ▌▌ ▌▌  ▌    ▐ 
 ▝▀▘ ▘ ▘▝▀  ▘  ▘ ▘ ▘ ▘ ▘▀▘▀▀▘▘ ▘▀▀ ▀▀▘▀▀▘ ▀▀ "
         echo ""
-        echo "[ ✖ ] Stay tuned for any new updates until available."
+        echo "[ ✖ ] Run [ install.ps1 ] script in your PowerShell to install."
         echo ""
         ;;
 esac
