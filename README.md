@@ -1,6 +1,7 @@
 # 🔐 passtw
 
-**passtw** is a Python-based random password generator + encrypted local vault, using AES‑128 encryption and a cryptographic key.
+One-command-line password generator + encrypted local vault
+Minimal, secure and easy-to-use CLI tool in Python
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge\&logo=python\&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
@@ -10,63 +11,53 @@
 
 ---
 
+## 📑 Table of Contents
+
+* [Project Overview](#project-overview)
+* [Features](#features)
+* [Requirements & Dependencies](#requirements--dependencies)
+* [Installation](#installation)
+* [Usage / CLI Commands](#usage--cli-commands)
+* [Configuration](#configuration)
+* [Security & Vault](#security--vault)
+* [Project Structure](#project-structure)
+* [Tests & Quality](#tests--quality)
+* [Roadmap](#roadmap)
+* [Contribution](#contribution)
+* [License](#license)
+
+---
+
 ## 📖 Project Overview
 
-passtw is a secure, minimalistic, and configurable command‑line tool for generating and storing passwords locally in an encrypted vault.
-
-Key features:
-
-* Password generation with customization (character types, symbols etc.);
-* Local vault encrypted using AES‑128, storing passwords and keys securely;
-* Configuration system to adjust generation parameters (via JSON or config);
-* Organized, modular code under `src/`, following good project structure practices;
-* Automated tests to ensure reliability and stability (via `tests/`).
-
-With this project, you get a **safe, maintainable and ready‑to‑use tool** for password management directly from the command line.
+passtw is a secure, minimalistic, and configurable command-line tool for generating and storing passwords locally in an encrypted vault. Designed for developers and sysadmins, it runs seamlessly on Linux, macOS, and Windows.
 
 ---
 
-## ⚙️ Features
+## 🚀 Features
 
-* Generate secure random passwords and store them in a local vault
-* Encryption key generation / rotation
-* Configurable behavior through config files / preferences
-* Easy CLI usage: generate, set, unset, manage vault, rotate keys
-* Clean, modular architecture (CLI layer / core logic / config layer)
-* Cross‑platform compatibility (works on Linux / Windows via provided scripts)
-* Unit tests covering core functionalities
-
----
-
-## 📁 Project Structure
-
-```
-├── src/                # Main source code
-│   ├── cli.py          # CLI entry point and argument parsing
-│   ├── config_loader.py
-│   ├── crypto_manager.py
-│   ├── generator.py
-│   ├── keygen.py
-│   ├── paths.py
-│   └── preferences.py
-├── tests/              # Test suite (pytest)
-├── LICENSE
-├── README.md
-├── pyproject.toml
-├── setup.py
-├── requirements.txt
-├── install.sh          # Install script for Unix
-├── install.ps1         # Install script for Windows
-└── pytest.ini
-```
+* Generate secure random passwords
+* Encrypted local vault storage (AES-128)
+* Configuration of password policies (length, character classes)
+* Key generation and rotation
+* CLI-based usage with multiple commands
+* Cross-platform support (Linux / macOS / Windows)
+* Clean project structure (`src/`, `tests/`)
+* Automated tests for reliability
 
 ---
 
-## 🔧 Installation
+## 📦 Requirements & Dependencies
 
-**Prerequisites:** Python 3.10+, pip and pipx must be installed before installing passtw.
+* Python 3.10+;
+* pip and pipx;
+* Optional: virtual environment for isolation.
 
-### Unix / Linux / macOS:
+---
+
+## 📥 Installation
+
+### Linux / macOS
 
 ```bash
 git clone https://github.com/luqastw/passtw.git
@@ -75,7 +66,7 @@ pip install -r requirements.txt
 sh install.sh
 ```
 
-### Windows (PowerShell):
+### Windows (PowerShell)
 
 ```powershell
 git clone https://github.com/luqastw/passtw.git
@@ -86,79 +77,109 @@ pip install -r requirements.txt
 
 ---
 
-## 🕹 Usage Examples
+## 🕹 Usage / CLI Commands
 
-Generate a new password:
+### Generate a new password:
 
 ```bash
 passtw generate
 ```
 
-Set generation options:
+### Set password policy options:
 
 ```bash
 passtw set {option}
 ```
 
-Unset options:
+### Unset password policy options:
 
 ```bash
 passtw unset {option}
 ```
 
-Show or adjust configuration (if supported):
+### Show actual configuration:
 
 ```bash
 passtw config
 ```
 
----
-
-## 🔐 Security & Vault Handling
-
-* Passwords and data are stored encrypted using AES‑128.
-* Encryption keys are stored/managed securely via the built‑in keygen module.
-* Vault and key files are local — no external services or remote storage — maximizing privacy and control.
-* Configurable settings allow to customize password policies, helping generate strong passwords.
+Use `passtw --help` for all available commands and options.
 
 ---
 
-## 🧪 Testing
+## ⚙️ Configuration
 
-The project includes automated tests covering key functionality (password generation, encryption/decryption, config loading, etc.).
+* Configuration is stored locally in JSON format.
+* You can adjust password inclusion of symbols, numbers, and other parameters.
+* `set` and `unset` commands allow dynamic updates without editing the config manually.
 
-Run tests with:
+---
+
+## 🔐 Security & Vault
+
+* Passwords are stored in an encrypted local vault using AES-128.
+* Keys are generated and managed internally by the `keygen` module.
+* No external storage or cloud dependencies — full local control.
+* Recommended file permissions: restrict access to vault files to the current user only.
+
+---
+
+## 🧰 Project Structure
+
+```
+src/
+  ├── cli.py             # CLI entry point
+  ├── generator.py       # Password generation logic
+  ├── crypto_manager.py  # Encryption / decryption functions
+  ├── config_loader.py   # Load / manage config
+  ├── keygen.py          # Key generation / rotation
+  ├── paths.py           # Paths and directories helper
+  └── preferences.py     # Default preferences (immutable guide)
+tests/                   # Automated test suite (pytest)
+LICENSE
+README.md
+pyproject.toml / setup.py
+requirements.txt
+install.sh / install.ps1
+```
+
+---
+
+## 🧪 Tests & Quality
+
+Run automated tests with:
 
 ```bash
 pytest -v
 ```
 
----
-
-## 👨‍💻 Why This Project Is Valuable for Recruiters / Hiring Managers
-
-* Demonstrates **clean, modular Python project structure** (src layout, setup scripts, clear separation of concerns)
-* Uses **real cryptography** — not naive random-only password generation — showing security awareness
-* Has **configurability and flexibility**, important for real-world tooling
-* Includes **automated tests**, showing commitment to quality and reliability
-* Provides a **usable CLI tool**, not just demo code — indicates ability to build usable utilities / tools
-* Cross-platform support (Linux, Windows) — shows consideration for different user environments
-* Demonstrates practical skills: encryption, file handling, CLI, configuration, packaging — all relevant for backend / dev‑ops / tooling roles
+All critical modules including password generation, encryption/decryption, and configuration management are tested.
 
 ---
 
-## 🗺 Potential Improvements (Roadmap / Ideas)
+## 🗺 Roadmap / Planned Features
 
-* Support for multiple vaults / profiles (e.g. vault per project or per user)
-* Export / import vault securely (e.g. encrypted backup)
-* CLI interactive mode or TUI interface (with colors / better UX)
-* Integration with system clipboard (copy password securely)
-* Password strength checker / estimation before saving
-* Option to hash master password / require master password to unlock vault
-* Packaging and release (PyPI) for easier installation
+* Multiple vaults / profiles for different projects
+* Secure backup / export of vault
+* Interactive TUI interface with enhanced UX
+* Integration with clipboard for secure password copy
+* Password strength estimation and recommendations
+* Packaging and release via PyPI
+
+---
+
+## 👨‍💻 Contribution
+
+* Fork the repository
+* Create a feature branch (`git checkout -b feature/my-feature`)
+* Commit your changes (`git commit -m 'Add new feature'`)
+* Push to branch (`git push origin feature/my-feature`)
+* Open a Pull Request
+
+Please follow the existing code style and write tests for new features.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License**.
+MIT License.
