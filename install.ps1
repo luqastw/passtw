@@ -24,8 +24,8 @@ function Start-Loader {
 function Stop-Loader {
     if ($script:loaderRunning -and $script:loaderJob) {
         if (Get-Job -Id $script:loaderJob.Id -ErrorAction SilentlyContinue) {
-            Stop-Job $script:loaderJob -Force -ErrorAction SilentlyContinue | Out-Null
-            Remove-Job $script:loaderJob -Force -ErrorAction SilentlyContinue | Out-Null
+            Stop-Job $script:loaderJob -ErrorAction SilentlyContinue | Out-Null
+            Remove-Job $script:loaderJob -ErrorAction SilentlyContinue | Out-Null
         }
     }
 
