@@ -1,4 +1,4 @@
-import json
+import json, click
 from src.paths import CONFIG_FILE
 from src.preferences import Preferences
 
@@ -16,7 +16,7 @@ class ConfigurationManager():
         data = json.loads(raw_json)
 
         if not any(data.values()):
-            raise ValueError("At least one type must be activated.")
+            raise click.ClickException("[ ✖ ] At least one type must be activated.")
             
         return Preferences(
             upper=data.get("upper", False),
