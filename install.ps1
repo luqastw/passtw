@@ -4,31 +4,36 @@ $ErrorActionPreference = "Stop"
 function Start-Loader {
     param([string]$Message)
 
+    if ($script:loaderRunning) { return }
+
     $script:loaderRunning = $true
 
-    Start-Job -ScriptBlock {
+    $script:loaderJob = Start-Job -ScriptBlock {
         param($Message)
-        
         while ($true) {
             Write-Host "`r$Message.  " -NoNewline
-            Start-Sleep -Milliseconds 300
+            Start-Sleep -Milliseconds 250
             Write-Host "`r$Message.. " -NoNewline
-            Start-Sleep -Milliseconds 300
+            Start-Sleep -Milliseconds 250
             Write-Host "`r$Message..." -NoNewline
-            Start-Sleep -Milliseconds 300
+            Start-Sleep -Milliseconds 250
         }
-    } -ArgumentList $Message | Set-Variable loaderJob
+    } -ArgumentList $Message
 }
 
 function Stop-Loader {
-    if ($script:loaderRunning -and (Get-Job -Id $loaderJob.Id -ErrorAction SilentlyContinue)) {
-        Stop-Job $loaderJob -Force | Out-Null
-        Remove-Job $loaderJob -Force | Out-Null
+    if ($script:loaderRunning -and $script:loaderJob) {
+        if (Get-Job -Id $script:loaderJob.Id -ErrorAction SilentlyContinue) {
+            Stop-Job $script:loaderJob -Force -ErrorAction SilentlyContinue | Out-Null
+            Remove-Job $script:loaderJob -Force -ErrorAction SilentlyContinue | Out-Null
+        }
     }
-    Write-Host "`r" -NoNewline
-    $script:loaderRunning = $false
-}
 
+    Write-Host "`r`e[2K" -NoNewline
+
+    $script:loaderRunning = $false
+    $script:loaderJob = $null
+}
 
 function Run-Silent {
     param([scriptblock]$cmd)
@@ -37,6 +42,7 @@ function Run-Silent {
 }
 
 Clear-Host
+
 Write-Host "
 ▐▀▘ ▜▘▙ ▌▞▀▖▀▛▘▞▀▖▌  ▌  ▞▀▖▀▛▘▜▘▞▀▖▙ ▌ ▀▜ 
 ▐   ▐ ▌▌▌▚▄  ▌ ▙▄▌▌  ▌  ▙▄▌ ▌ ▐ ▌ ▌▌▌▌  ▐ 
@@ -45,7 +51,7 @@ Write-Host "
 " -ForegroundColor Cyan
 
 Write-Host ""
-Write-Host "[ ! ] Installing passtw for Windows."
+Write-Host "[ * ] Installing passtw for Windows."
 Write-Host ""
 
 Start-Loader "[ 1 ] Detecting Python"
@@ -69,20 +75,23 @@ Start-Loader "[ 2 ] Detecting pipx"
 
 $pipx = Get-Command pipx -ErrorAction SilentlyContinue
 
+Stop-Loader
+
 if (-not $pipx) {
-    Stop-Loader
     Write-Host "[ i ] pipx not found. Installing..." -ForegroundColor Yellow
 
     Start-Loader "[ 2 ] Installing pipx"
 
-    Run-Silent { python -m pip install --user pipx }
-    Run-Silent { python -m pipx ensurepath }
+    Run-Silent { & $using:PY -m pip install --user pipx }
+    Run-Silent { & $using:PY -m pipx ensurepath }
 
     Stop-Loader
     Write-Host "[ ✓ ] pipx installed." -ForegroundColor Green
 
-    $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","User") + ";" +
-                [System.Environment]::GetEnvironmentVariable("PATH","Machine")
+    $PipxBin = "$env:USERPROFILE\.local\bin"
+    if (-not ($env:PATH -split ";" | Where-Object { $_ -eq $PipxBin })) {
+        $env:PATH += ";$PipxBin"
+    }
 
     $pipx = Get-Command pipx -ErrorAction SilentlyContinue
     if (-not $pipx) {
@@ -90,13 +99,14 @@ if (-not $pipx) {
         exit 1
     }
 } else {
-    Stop-Loader
     Write-Host "[ ✓ ] pipx found." -ForegroundColor Green
 }
 
 Start-Loader "[ 3 ] Installing passtw"
 
-Run-Silent { pipx install . }
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+Run-Silent { pipx install $using:ScriptDir }
 
 Stop-Loader
 
@@ -115,6 +125,6 @@ Write-Host "
 ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝   ╚═╝    ╚══╝╚══╝ 
 " -ForegroundColor Cyan
 
-Write-Host "[ ✓ ] Successfully installed!" -ForegroundColor Green
-Write-Host "Type 'passtw init' to start."
+Write-Host "[ ✓ ] Successfully installed." -ForegroundColor Green
+Write-Host "Type passtw init to start."
 Write-Host ""
