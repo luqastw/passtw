@@ -1,7 +1,11 @@
 # 🔐 passtw
 
-One-command-line password generator + encrypted local vault
-Minimal, secure and easy-to-use CLI tool in Python
+One-command-line password generator + encrypted local vault. Minimal, secure and easy-to-use CLI tool in Python.
+
+<p align="center">
+  <img src="assets/demo.svg" alt="Demo da CLI" />
+</p>
+
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge\&logo=python\&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
