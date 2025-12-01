@@ -8,7 +8,7 @@ function Start-Loader {
 
     $script:loaderRunning = $true
 
-    $script:loaderJob = Start-Job -ScriptBlock {
+    $script:loaderJob = Start-ThreadJob -ScriptBlock {
         param($Message)
         while ($true) {
             Write-Host "`r$Message... " -NoNewline
@@ -23,10 +23,8 @@ function Start-Loader {
 
 function Stop-Loader {
     if ($script:loaderRunning -and $script:loaderJob) {
-        if (Get-Job -Id $script:loaderJob.Id -ErrorAction SilentlyContinue) {
-            Stop-Job $script:loaderJob -ErrorAction SilentlyContinue | Out-Null
-            Remove-Job $script:loaderJob -ErrorAction SilentlyContinue | Out-Null
-        }
+        Stop-Job $script:loaderJob -ErrorAction SilentlyContinue | Out-Null
+        Remove-Job $script:loaderJob -ErrorAction SilentlyContinue | Out-Null
     }
 
     Write-Host "`r`e[2K" -NoNewline
@@ -43,6 +41,11 @@ function Run-Silent {
 
 Clear-Host
 
+Write-Host "
+▐▀▘ ▛▀▖▛▀▖▞▀▖▞▀▖▛▀▘▞▀▖▞▀▖▜▘▙ ▌▞▀▖ ▀▜ 
+▐   ▙▄▘▙▄▘▌ ▌▌  ▙▄ ▚▄ ▚▄ ▐ ▌▌▌▌▄▖  ▐ 
+▐   ▌  ▌▚ ▌ ▌▌ ▖▌  ▖ ▌▖ ▌▐ ▌▝▌▌ ▌  ▐ 
+▝▀▘ ▘  ▘ ▘▝▀ ▝▀ ▀▀▘▝▀ ▝▀ ▀▘▘ ▘▝▀  ▀▀ "
 Write-Host ""
 Write-Host "Installing passtw for Windows."
 Write-Host ""
@@ -75,13 +78,14 @@ if (-not $pipx) {
 
     Start-Loader "Installing pipx"
 
-    Run-Silent { & $using:PY -m pip install --user pipx }
-    Run-Silent { & $using:PY -m pipx ensurepath }
+    Run-Silent { & $PY -m pip install --user pipx }
+    Run-Silent { & $PY -m pipx ensurepath }
 
     Stop-Loader
     Write-Host "pipx installed."
 
-    $PipxBin = "$env:USERPROFILE\.local\bin"
+    # Caminho real do pipx no Windows
+    $PipxBin = "$env:USERPROFILE\AppData\Roaming\Python\Scripts"
     if (-not ($env:PATH -split ";" | Where-Object { $_ -eq $PipxBin })) {
         $env:PATH += ";$PipxBin"
     }
@@ -99,16 +103,32 @@ Start-Loader "Installing passtw"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-Run-Silent { pipx install $using:ScriptDir }
+# instala do diretório local
+Run-Silent { pipx install $ScriptDir --force }
 
 Stop-Loader
 
-if (-not (Get-Command passtw -ErrorAction SilentlyContinue)) {
-    Write-Host "ERROR: passtw not found. Install failed."
-    exit 1
+# Teste final
+$passtwCheck = Get-Command passtw -ErrorAction SilentlyContinue
+if (-not $passtwCheck) {
+    Write-Host "WARNING: passtw not available in PATH in this session."
+    Write-Host "Try opening a new terminal OR run:"
+    Write-Host ""
+    Write-Host "    refreshenv"
+    Write-Host ""
+} else {
+    Write-Host "passtw detected."
 }
 
 Clear-Host
-Write-Host "passtw installed successfully."
-Write-Host "Type: passtw init"
+Write-Host "
+██████╗  █████╗ ███████╗███████╗████████╗██╗    ██╗
+██╔══██╗██╔══██╗██╔════╝██╔════╝╚══██╔══╝██║    ██║
+██████╔╝███████║███████╗███████╗   ██║   ██║ █╗ ██║
+██╔═══╝ ██╔══██║╚════██║╚════██║   ██║   ██║███╗██║
+██║     ██║  ██║███████║███████║   ██║   ╚███╔███╔╝
+╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝   ╚═╝    ╚══╝╚══╝ 
+"
+Write-Host "Installed successfully."
+Write-Host "Run passtw init to start."
 Write-Host ""
