@@ -87,6 +87,12 @@ cd passtw
 passtw generate
 ```
 
+### Get a password from vault:
+
+```bash
+passtw get {password name}
+```
+
 ### Set password policy options:
 
 ```bash

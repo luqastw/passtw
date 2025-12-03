@@ -1,4 +1,11 @@
 from src.crypto_manager import CryptoManager
+from src.generator import PasswordGenerator
+from src.paths import VAULT_FILE
+import random, json
+
+generator = PasswordGenerator()
+random_password = generator.generate()
+vault_data = json.loads(VAULT_FILE.read_text())
 
 def test_load_key():
     manager = CryptoManager()
@@ -10,4 +17,7 @@ def test_get_fernet():
 
 def test_encrypt_password():
     manager = CryptoManager()
-    manager._encrypt_password()
+    manager._encrypt_password(random_password)
+
+def test_decrypt_password():
+    manager = CryptoManager()
