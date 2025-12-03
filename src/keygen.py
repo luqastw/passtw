@@ -1,6 +1,5 @@
 from cryptography.fernet import Fernet
 from src.paths import KEY_FILE
-from pathlib import Path
 import os, stat
 
 def secure_permissions(file):
