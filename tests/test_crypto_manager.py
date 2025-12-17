@@ -1,7 +1,7 @@
 from passtw.crypto_manager import CryptoManager
 from passtw.generator import PasswordGenerator
 from passtw.paths import VAULT_FILE
-import random, json
+import random, json, pytest
 
 generator = PasswordGenerator()
 random_password = generator.generate()
