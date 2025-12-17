@@ -1,8 +1,16 @@
 #!/bin/bash
 
+# --- Cores e Estilo ---
+R="\033[0;31m" # Red
+G="\033[0;32m" # Green
+Y="\033[1;33m" # Yellow
+C="\033[0;36m" # Cyan
+N="\033[0m"    # No Color
+
+LOG_FILE="install_debug.log"
+
 detect_system() {
     local os="$(uname -s)"
-
     case "$os" in
         Linux)   echo "Linux" ;;
         Darwin)  echo "MacOS" ;;
@@ -12,180 +20,137 @@ detect_system() {
 
 loader() {
     local msg="$1"
-    while :; do
-        printf "\r%s.  " "$msg"; sleep 0.3
-        printf "\r%s.. " "$msg"; sleep 0.3
-        printf "\r%s..." "$msg"; sleep 0.3
+    local pid=$!
+    local delay=0.1
+    local spinstr='|/-\'
+    
+    # Esconde o cursor
+    tput civis
+    
+    while ps -p $pid > /dev/null; do
+        local temp=${spinstr#?}
+        printf " [%c]  %s" "$spinstr" "$msg"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        printf "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
     done
+    
+    # Restaura o cursor
+    tput cnorm
+    # Limpa a linha final
+    printf "                                                          \r"
 }
 
-run_silent() {
-    "$@" > /dev/null 2>&1
+# Wrapper para rodar comandos e logar erros, mas manter limpo na tela
+run_safe() {
+    "$@" >> "$LOG_FILE" 2>&1
+    return $?
 }
 
+# --- INÍCIO ---
+rm -f "$LOG_FILE" # Limpa log antigo
 clear
-echo "
+echo -e "${C}
 ▐▀▘ ▜▘▙ ▌▞▀▖▀▛▘▞▀▖▌  ▌  ▞▀▖▀▛▘▜▘▞▀▖▙ ▌ ▀▜ 
 ▐   ▐ ▌▌▌▚▄  ▌ ▙▄▌▌  ▌  ▙▄▌ ▌ ▐ ▌ ▌▌▌▌  ▐ 
 ▐   ▐ ▌▝▌▖ ▌ ▌ ▌ ▌▌  ▌  ▌ ▌ ▌ ▐ ▌ ▌▌▝▌  ▐ 
-▝▀▘ ▀▘▘ ▘▝▀  ▘ ▘ ▘▀▀▘▀▀▘▘ ▘ ▘ ▀▘▝▀ ▘ ▘ ▀▀ "
+▝▀▘ ▀▘▘ ▘▝▀  ▘ ▘ ▘▀▀▘▀▀▘▘ ▘ ▘ ▀▘▝▀ ▘ ▘ ▀▀ ${N}"
 echo ""
 echo "Choose your operational system:"
-echo "[ 1 ] Linux"
-echo "[ 2 ] MacOS"
-echo "[ 3 ] Windows"
+echo -e "[ 1 ] Linux"
+echo -e "[ 2 ] MacOS"
+echo -e "[ 3 ] Windows"
 read -p "> " option
 
 REAL_OS=$(detect_system)
 
+# Validação da Opção
 case "$option" in
-    1) USER_OS="Linux" ;;
-    2) USER_OS="MacOS" ;;
-    3) USER_OS="Windows" ;;
+    1) TARGET_OS="Linux" ;;
+    2) TARGET_OS="MacOS" ;;
+    3) TARGET_OS="Windows" ;;
     *)
-        clear
-        echo "[ ✖ ] Invalid option. Please choose 1, 2, or 3."
-        echo ""
+        echo -e "${R}[ ✖ ] Invalid option.${N}"
         exit 1
         ;;
 esac
 
-if [ "$USER_OS" != "$REAL_OS" ]; then
-    clear
-    echo "[ ✖ ] The chosen system does not match your real OS."
-    echo "      → You chose: $USER_OS"
-    echo "      → Real OS:   $REAL_OS"
+# Validação do Sistema Real
+if [ "$TARGET_OS" != "$REAL_OS" ] && [ "$TARGET_OS" != "Windows" ]; then
+    echo -e "${Y}[ ! ] Warning: You chose $TARGET_OS but you are on $REAL_OS.${N}"
+    read -p "Continue anyway? (y/n) " -n 1 -r
     echo ""
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
+
+# Se for Windows, sai fora
+if [ "$TARGET_OS" == "Windows" ]; then
+    echo -e "${R}[ ✖ ] Please run 'install.ps1' on PowerShell.${N}"
+    exit 0
+fi
+
+# --- INSTALAÇÃO LINUX/MAC (Lógica Unificada) ---
+clear
+echo -e "${C}
+▐▀▘ ▛▀▖▛▀▖▞▀▖▞▀▖▛▀▘▞▀▖▞▀▖▜▘▙ ▌▞▀▖ ▀▜ 
+▐   ▙▄▘▙▄▘▌ ▌▌  ▙▄ ▚▄ ▚▄ ▐ ▌▌▌▌▄▖  ▐ 
+▐   ▌  ▌▚ ▌ ▌▌ ▖▌  ▖ ▌▖ ▌▐ ▌▝▌▌ ▌  ▐ 
+▝▀▘ ▘  ▘ ▘▝▀ ▝▀ ▀▀▘▝▀ ▝▀ ▀▘▘ ▘▝▀  ▀▀ ${N}"
+echo ""
+echo -e "${C}[ ✓ ] Target: $TARGET_OS${N}"
+
+# 1. Detectar Python
+(sleep 1) & 
+loader "Detecting Python..."
+if command -v python3 >/dev/null 2>&1; then
+    PY=python3
+elif command -v python >/dev/null 2>&1; then
+    PY=python
+else
+    echo -e "${R}[ ✖ ] Python not found.${N}"
+    echo "Check $LOG_FILE for details."
+    exit 1
+fi
+echo -e "${G}[ ✓ ] Python found ($PY)${N}"
+
+# 2. Detectar Pipx
+(sleep 1) &
+loader "Detecting pipx..."
+if command -v pipx >/dev/null 2>&1; then
+    echo -e "${G}[ ✓ ] pipx found${N}"
+else
+    echo -e "${R}[ ✖ ] pipx not found.${N}"
+    echo "Please install pipx first (e.g., sudo pacman -S python-pipx)"
     exit 1
 fi
 
-case "$option" in
-    1)
-        clear
-        echo "
-▐▀▘ ▛▀▖▛▀▖▞▀▖▞▀▖▛▀▘▞▀▖▞▀▖▜▘▙ ▌▞▀▖ ▀▜ 
-▐   ▙▄▘▙▄▘▌ ▌▌  ▙▄ ▚▄ ▚▄ ▐ ▌▌▌▌▄▖  ▐ 
-▐   ▌  ▌▚ ▌ ▌▌ ▖▌  ▖ ▌▖ ▌▐ ▌▝▌▌ ▌  ▐ 
-▝▀▘ ▘  ▘ ▘▝▀ ▝▀ ▀▀▘▝▀ ▝▀ ▀▘▘ ▘▝▀  ▀▀ "
-        echo ""
-        echo "[ ✓ ] OS selected: Linux"
-        loader "[ 1 ] Detecting Python" &
-        LOADER_PID=$!
-        if run_silent command -v python3; then
-            kill "$LOADER_PID" >/dev/null 2>&1
-            PY=python3
-        elif run_silent command -v python; then
-            kill "$LOADER_PID" >/dev/null 2>&1
-            PY=python
-        else
-            kill "$LOADER_PID" >/dev/null 2>&1
-            printf "\r%-40s\r" 
-            echo "[ ✖ ] Python not found."
-            exit 1
-        fi
+# 3. Instalar/Atualizar Passtw
+# O pulo do gato: usamos --force para garantir update
+# E checamos o código de saída ($?)
+(run_safe pipx install . --force) &
+PID_INSTALL=$!
+loader "Installing passtw v1.0.0..."
+wait $PID_INSTALL
+EXIT_CODE=$?
 
-        printf "\r%-40s\r" 
-        echo "[ ✓ ] Python found."
-
-        loader "[ 2 ] Detecting pipx" &
-        LOADER_PID=$!
-        if run_silent command -v pipx; then
-            kill "$LOADER_PID" >/dev/null 2>&1
-            printf "\r%-40s\r" 
-            echo "[ ✓ ] pipx found."
-        else
-            kill "$LOADER_PID" >/dev/null 2>&1
-            printf "\r%-40s\r" 
-            echo "[ ✖ ] pipx not found."
-            exit 1
-        fi
-
-        loader "[ 3 ] Installing passtw" &
-        LOADER_PID=$!
-        run_silent pipx install .
-        kill "$LOADER_PID" >/dev/null 2>&1
-        clear
-
-        echo "
-██████╗  █████╗ ███████╗███████╗████████╗██╗    ██╗
+if [ $EXIT_CODE -eq 0 ]; then
+    clear
+    echo -e "${G}
+██████╗  █████╗ ███████╗████████╗███████╗██╗    ██╗
 ██╔══██╗██╔══██╗██╔════╝██╔════╝╚══██╔══╝██║    ██║
 ██████╔╝███████║███████╗███████╗   ██║   ██║ █╗ ██║
 ██╔═══╝ ██╔══██║╚════██║╚════██║   ██║   ██║███╗██║
 ██║     ██║  ██║███████║███████║   ██║   ╚███╔███╔╝
-╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝   ╚═╝    ╚══╝╚══╝ 
-        "
-        echo "[ ✓ ] Succefully installed!"
-        echo "Type passtw init to start."
-        echo ""
-        ;;
-
-    2) 
-        clear
-        echo "
-▐▀▘ ▛▀▖▛▀▖▞▀▖▞▀▖▛▀▘▞▀▖▞▀▖▜▘▙ ▌▞▀▖ ▀▜ 
-▐   ▙▄▘▙▄▘▌ ▌▌  ▙▄ ▚▄ ▚▄ ▐ ▌▌▌▌▄▖  ▐ 
-▐   ▌  ▌▚ ▌ ▌▌ ▖▌  ▖ ▌▖ ▌▐ ▌▝▌▌ ▌  ▐ 
-▝▀▘ ▘  ▘ ▘▝▀ ▝▀ ▀▀▘▝▀ ▝▀ ▀▘▘ ▘▝▀  ▀▀ "
-        echo ""
-        echo "[ ✓ ] OS selected: MacOs"
-        loader "[ 1 ] Detecting Python" &
-        LOADER_PID=$!
-        if run_silent command -v python3; then
-            kill "$LOADER_PID" >/dev/null 2>&1
-            PY=python3
-        elif run_silent command -v python; then
-            kill "$LOADER_PID" >/dev/null 2>&1
-            PY=python
-        else
-            kill "$LOADER_PID" >/dev/null 2>&1
-            echo "[ ✖ ] Python not found."
-            exit 1
-        fi
-
-        printf "\r%-40s\r" 
-        echo "[ ✓ ] Python found."
-
-        loader "[ 2 ] Detecting pipx" &
-        LOADER_PID=$!
-        if run_silent command -v pipx; then
-            kill "$LOADER_PID" >/dev/null 2>&1
-            printf "\r%-40s\r" 
-            echo "[ ✓ ] pipx found."
-        else
-            kill "$LOADER_PID" >/dev/null 2>&1
-            printf "\r%-40s\r" 
-            echo "[ ✖ ] pipx not found."
-            exit 1
-        fi
-
-        loader "[ 3 ] Installing passtw" &
-        LOADER_PID=$!
-        run_silent pipx install .
-        kill "$LOADER_PID" >/dev/null 2>&1
-        clear
-
-        echo "
-██████╗  █████╗ ███████╗███████╗████████╗██╗    ██╗
-██╔══██╗██╔══██╗██╔════╝██╔════╝╚══██╔══╝██║    ██║
-██████╔╝███████║███████╗███████╗   ██║   ██║ █╗ ██║
-██╔═══╝ ██╔══██║╚════██║╚════██║   ██║   ██║███╗██║
-██║     ██║  ██║███████║███████║   ██║   ╚███╔███╔╝
-╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝   ╚═╝    ╚══╝╚══╝ 
-        "
-        echo "[ ✓ ] Succefully installed!"
-        echo "Type passtw init to start."
-        echo""
-        ;;
-    
-    3)
-        clear
-        echo "
-▐▀▘ ▙ ▌▞▀▖▀▛▘ ▞▀▖▌ ▌▞▀▖▜▘▌  ▞▀▖▛▀▖▌  ▛▀▘ ▀▜ 
-▐   ▌▌▌▌ ▌ ▌  ▙▄▌▚▗▘▙▄▌▐ ▌  ▙▄▌▙▄▘▌  ▙▄   ▐ 
-▐   ▌▝▌▌ ▌ ▌  ▌ ▌▝▞ ▌ ▌▐ ▌  ▌ ▌▌ ▌▌  ▌    ▐ 
-▝▀▘ ▘ ▘▝▀  ▘  ▘ ▘ ▘ ▘ ▘▀▘▀▀▘▘ ▘▀▀ ▀▀▘▀▀▘ ▀▀ "
-        echo ""
-        echo "[ ✖ ] Run [ install.ps1 ] script in your PowerShell to install."
-        echo ""
-        ;;
-esac
+╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝   ╚═╝    ╚══╝╚══╝ ${N}"
+    echo ""
+    echo -e "${G}[ ✓ ] Successfully installed!${N}"
+    echo -e "Run ${Y}passtw${N} to start."
+    echo ""
+else
+    echo -e "${R}
+[ ✖ ] Installation FAILED.${N}"
+    echo "Check the log file for errors: $LOG_FILE"
+    echo "Tip: Try running 'pipx uninstall passtw' and try again."
+fi

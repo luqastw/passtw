@@ -1,5 +1,5 @@
-from src.generator import create_password, get_password
-from src.paths import VAULT_FILE
+from passtw.generator import create_password, get_password
+from passtw.paths import VAULT_FILE
 import secrets, random, string, json
 
 def generate_name():

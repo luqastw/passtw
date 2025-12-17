@@ -1,16 +1,30 @@
-[project]
+[tool.poetry]
 name = "passtw"
-version = "0.1.0"
-dependencies = [
-    "click",
-    "cryptography",
-]
+version = "1.0.0"
+description = "One-command-line password generator + encrypted local vault. Minimal, secure and easy-to-use CLI tool in Python."
+authors = ["luqastw lucasborcem1@gmail.com"]
+readme = "README.md"
+packages = [{include = 'passtw', from = 'src'}]
 
-[tool.setuptools]
-packages = ["src"]
+[tool.poetry.dependencies]
+python = "^3.10"
+cryptography = "^46.0.3"
+pyperclip = "^1.11.0"
+platformdirs = "^4.5.1"
+click = "^8.3.1"
+pygments = "^2.19.2"
+safety = "^3.7.0"
 
-[tool.setuptools.package-dir]
-src = "src"
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+bandit = "^1.7"
+ruff = "^0.1"
+black = "^24.0"
+pip-audit = "^2.10.0"
 
-[project.scripts]
-passtw = "src.cli:passtw"
+[tool.poetry.scripts]
+passtw = "passtw.cli:passtw" 
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

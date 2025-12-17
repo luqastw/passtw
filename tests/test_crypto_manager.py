@@ -1,6 +1,6 @@
-from src.crypto_manager import CryptoManager
-from src.generator import PasswordGenerator
-from src.paths import VAULT_FILE
+from passtw.crypto_manager import CryptoManager
+from passtw.generator import PasswordGenerator
+from passtw.paths import VAULT_FILE
 import random, json
 
 generator = PasswordGenerator()

@@ -1,4 +1,4 @@
-from src.config_loader import ConfigurationManager
+from passtw.config_loader import ConfigurationManager
 
 def test_ensure_file_exists():
     manager = ConfigurationManager()
