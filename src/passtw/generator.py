@@ -1,6 +1,6 @@
-from src.config_loader import ConfigurationManager
-from src.crypto_manager import crypt_generated, CryptoManager
-from src.preferences import Preferences
+from passtw.config_loader import ConfigurationManager
+from passtw.crypto_manager import crypt_generated, CryptoManager
+from passtw.preferences import Preferences
 import string, secrets
 
 class PasswordGenerator():

@@ -1,6 +1,6 @@
 from cryptography.fernet import Fernet
-from src.paths import KEY_FILE, VAULT_FILE
-from src.keygen import generate_key
+from passtw.paths import KEY_FILE, VAULT_FILE
+from passtw.keygen import generate_key
 import json, click
 
 class CryptoManager():

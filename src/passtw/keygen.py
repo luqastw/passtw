@@ -1,5 +1,5 @@
 from cryptography.fernet import Fernet
-from src.paths import KEY_FILE
+from passtw.paths import KEY_FILE
 import os, stat
 
 def secure_permissions(file):

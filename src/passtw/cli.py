@@ -1,10 +1,10 @@
 import click, json, os, platform
 from pathlib import Path
 from functools import wraps
-from src.keygen import generate_key
-from src.generator import create_password, get_password
-from src.config_loader import ConfigurationManager
-from src.paths import CONFIG_FILE, VAULT_FILE, KEY_FILE
+from passtw.keygen import generate_key
+from passtw.generator import create_password, get_password
+from passtw.config_loader import ConfigurationManager
+from passtw.paths import CONFIG_FILE, VAULT_FILE, KEY_FILE
 
 config_manager = ConfigurationManager()
 OPTION_NAMES = {

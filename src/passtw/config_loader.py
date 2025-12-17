@@ -1,6 +1,6 @@
 import json, click
-from src.paths import CONFIG_FILE
-from src.preferences import Preferences
+from passtw.paths import CONFIG_FILE
+from passtw.preferences import Preferences
 
 class ConfigurationManager():
     def _ensure_config(self):
