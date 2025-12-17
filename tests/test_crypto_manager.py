@@ -5,7 +5,6 @@ import random, json
 
 generator = PasswordGenerator()
 random_password = generator.generate()
-vault_data = json.loads(VAULT_FILE.read_text())
 
 def test_load_vault():
     if not VAULT_FILE.exists():
