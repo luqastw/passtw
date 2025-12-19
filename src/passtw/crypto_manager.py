@@ -5,6 +5,13 @@ import click
 
 
 class CryptoManager:
+    def __init__(self):
+        self.key = self._load_key()
+        if not VAULT_FILE.exists():
+            self.vault_data = {}
+        else:
+            self.vault_data = json.loads(VAULT_FILE.read_text())
+
     def _load_key(self):
         if KEY_FILE.exists():
             return KEY_FILE.read_bytes()
