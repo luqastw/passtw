@@ -1,14 +1,15 @@
 from passtw.config_loader import ConfigurationManager
 from passtw.crypto_manager import crypt_generated, CryptoManager
-from passtw.preferences import Preferences
-import string, secrets
+import string
+import secrets
 
-class PasswordGenerator():
+
+class PasswordGenerator:
     def __init__(self):
         self.config = self._load_config()
         self.PASSWORD = []
         self.CHAR_POOL = {}
-        self.ALL_CHARS = ''
+        self.ALL_CHARS = ""
 
     def _load_config(self):
         manager = ConfigurationManager()
@@ -46,7 +47,7 @@ class PasswordGenerator():
             j = secrets.randbelow(i + 1)
             self.PASSWORD[i], self.PASSWORD[j] = self.PASSWORD[j], self.PASSWORD[i]
 
-        return ''.join(self.PASSWORD)
+        return "".join(self.PASSWORD)
 
     def generate(self):
         self._build_pool()
@@ -54,10 +55,12 @@ class PasswordGenerator():
         self._fill_random()
         return self._secure_shuffle()
 
+
 def create_password(name: str):
     generator = PasswordGenerator()
     generated_password = generator.generate()
     return crypt_generated(name, generated_password)
+
 
 def get_password(name: str):
     manager = CryptoManager()

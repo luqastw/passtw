@@ -1,4 +1,7 @@
-import click, json, os, platform
+import click
+import json
+import os
+import platform
 from pathlib import Path
 from functools import wraps
 from passtw.keygen import generate_key
@@ -10,9 +13,10 @@ config_manager = ConfigurationManager()
 OPTION_NAMES = {
     "upper": "Uppercase",
     "lower": "Lowercase",
-    "nums":  "Digits",
-    "sims":  "Symbols",
+    "nums": "Digits",
+    "sims": "Symbols",
 }
+
 
 def ensure_vault():
     if VAULT_FILE.exists():
@@ -20,8 +24,10 @@ def ensure_vault():
     else:
         return VAULT_FILE.write_text(json.dumps({}, indent=4))
 
+
 def full_name(option: str) -> str:
     return OPTION_NAMES.get(option, option)
+
 
 def get_state_file() -> Path:
     system = platform.system()
@@ -35,6 +41,7 @@ def get_state_file() -> Path:
 
     return Path.home() / "passtw_state.json"
 
+
 def is_initialized() -> bool:
     f = get_state_file()
     if not f.exists():
@@ -43,8 +50,9 @@ def is_initialized() -> bool:
     try:
         data = json.loads(f.read_text())
         return data.get("initialized", False)
-    except:
+    except (FileNotFoundError, json.JSONDecodeError):
         return False
+
 
 def run_init():
     generate_key()
@@ -57,12 +65,14 @@ def run_init():
     click.echo("[ ⏻ ] Succefully initialized!")
     click.echo("")
 
+
 def set_config_value(key: str, value: bool):
     config_manager._ensure_config()
     config = json.loads(CONFIG_FILE.read_text())
     config[key] = value
 
     return CONFIG_FILE.write_text(json.dumps(config, indent=4))
+
 
 def set_all_values(value: bool):
     config_manager._ensure_config()
@@ -74,34 +84,37 @@ def set_all_values(value: bool):
 
     return CONFIG_FILE.write_text(json.dumps(config, indent=4))
 
+
 def require_init(f):
     """Blocks any command until it's not initialized."""
 
     @wraps(f)
     def wrapper(*args, **kwargs):
         if not is_initialized():
-            raise click.ClickException(
-                "[ ✖ ] Type 'passtw init' to start."
-            )
+            raise click.ClickException("[ ✖ ] Type 'passtw init' to start.")
         return f(*args, **kwargs)
+
     return wrapper
+
 
 @click.group()
 def passtw():
     """Command line interface of passtw."""
     pass
 
+
 @passtw.command()
 def init():
     """Initialize passtw dependencies."""
     run_init()
+
 
 @passtw.command()
 @require_init
 @click.argument("options", nargs=-1)
 def set(options):
     """Enable characters in password pool."""
-    
+
     config_manager._ensure_config()
     config_data = json.loads(CONFIG_FILE.read_text())
 
@@ -119,6 +132,7 @@ def set(options):
         else:
             click.echo(f":     {option} → not found.")
     click.echo("")
+
 
 @passtw.command()
 @require_init
@@ -145,13 +159,13 @@ def unset(options):
             click.echo(f":     {option} → not found.")
     click.echo("")
 
+
 @passtw.command()
 @require_init
 def config():
     """Show actual configuration."""
 
     ensure_vault()
-    config = config_manager._ensure_config()
     config_data = json.loads(CONFIG_FILE.read_text())
     vault_data = json.loads(VAULT_FILE.read_text())
 
@@ -168,6 +182,7 @@ def config():
         click.echo("[ ✓ ] Key activated.")
     click.echo("")
 
+
 @passtw.command()
 @require_init
 def keygen():
@@ -183,6 +198,7 @@ def keygen():
         click.echo("[ ✗ ] Cryptgraphic key already exists.")
         click.echo("")
 
+
 @passtw.command()
 @require_init
 @click.argument("name")
@@ -190,9 +206,10 @@ def generate(name):
     """Generate new password."""
     create_password(name)
     click.echo("")
-    click.echo(f"[ ✓ ] Password created!")
+    click.echo("[ ✓ ] Password created!")
     click.echo(f":     {name} allocated in your vault.")
     click.echo("")
+
 
 @passtw.command()
 @require_init
@@ -201,9 +218,11 @@ def get(name):
     """Get password from vault."""
     password = get_password(name)
     click.echo("")
-    click.echo(f"[ ✓ ] Vault open!")
+    click.echo("[ ✓ ] Vault open!")
     click.echo(f":     {name}: {password}")
     click.echo("")
 
+
 if __name__ == "__main__":
     passtw()
+
