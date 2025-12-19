@@ -1,6 +1,10 @@
 from passtw.generator import create_password, get_password
 from passtw.paths import VAULT_FILE
-import secrets, random, string, json, pytest
+import secrets
+import random
+import string
+import json
+import pytest
 
 @pytest.mark.skip(reason='Refactor needed using mocker. Release v1.1.0')
 def generate_name():
