@@ -52,7 +52,9 @@ def test_read_success(mock_exists, mock_bytes, mock_text):
 
 @patch("pathlib.Path.read_bytes")
 @patch("pathlib.Path.exists")
-def test_load_key(mock_exists, mock_read_bytes):
+@patch('pathlib.Path.read_text')
+def test_load_key(mock_read_text, mock_exists, mock_read_bytes):
+    mock_read_text.return_value = json.dumps({})
     mock_exists.return_value = True
     mock_read_bytes.return_value = FAKE_KEY
     manager = CryptoManager()
