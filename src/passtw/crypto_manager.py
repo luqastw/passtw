@@ -1,14 +1,24 @@
 from cryptography.fernet import Fernet
 from passtw.paths import KEY_FILE, VAULT_FILE
-from passtw.keygen import generate_key
-import json, click
+import json
+import click
 
-class CryptoManager():
+
+class CryptoManager:
+    def __init__(self):
+        self.key = self._load_key()
+        if not VAULT_FILE.exists():
+            self.vault_data = {}
+        else:
+            self.vault_data = json.loads(VAULT_FILE.read_text())
+
     def _load_key(self):
-        if KEY_FILE.exists(): 
+        if KEY_FILE.exists():
             return KEY_FILE.read_bytes()
-        else: 
-            raise click.ClickException("[ ✖ ] Key not found. Type 'passtw genkey' to generate a new key.")
+        else:
+            raise click.ClickException(
+                "[ ✖ ] Key not found. Type 'passtw genkey' to generate a new key."
+            )
 
     def _get_fernet(self):
         self.key = self._load_key()
@@ -41,7 +51,9 @@ class CryptoManager():
         self._load_key()
         if not VAULT_FILE.exists():
             VAULT_FILE.write_text(json.dumps({}, indent=4))
-            raise click.ClickException("[ ✖ ] Vault.json not found. Creating default...")
+            raise click.ClickException(
+                "[ ✖ ] Vault.json not found. Creating default..."
+            )
 
         self.data = json.loads(VAULT_FILE.read_text())
 
@@ -61,6 +73,7 @@ class CryptoManager():
 
     def read_password(self, name):
         return self._read_from_vault(name)
+
 
 def crypt_generated(name, password):
     manager = CryptoManager()
