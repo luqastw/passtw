@@ -2,6 +2,7 @@ import click
 import json
 import os
 import platform
+import pyperclip
 from pathlib import Path
 from functools import wraps
 from passtw.keygen import generate_key
@@ -62,7 +63,7 @@ def run_init():
     f.parent.mkdir(parents=True, exist_ok=True)
     f.write_text(json.dumps({"initialized": True}, indent=4))
     click.echo("")
-    click.echo("[ ⏻ ] Succefully initialized!")
+    click.secho("[ ⏻ ] Succefully initialized!", fg='bright_green')
     click.echo("")
 
 
@@ -119,18 +120,18 @@ def set(options):
     config_data = json.loads(CONFIG_FILE.read_text())
 
     click.echo("")
-    click.echo("[ ⚙ ] Configuration updated.")
+    click.secho("[ ⚙ ] Configuration updated.", fg='cyan')
     for option in options:
         if option == "all":
             set_all_values(True)
-            click.echo(":     All options → enabled.")
+            click.secho(":     All options →  enabled.", fg='green')
             break
 
         if option in config_data:
             set_config_value(option, True)
-            click.echo(f":     {full_name(option)} → enabled.")
+            click.secho(f":     {full_name(option)} →> enabled.", fg='green')
         else:
-            click.echo(f":     {option} → not found.")
+            click.secho(f":     {option} →  not found.", fg='red')
     click.echo("")
 
 
@@ -145,18 +146,18 @@ def unset(options):
     config_data = json.loads(CONFIG_FILE.read_text())
 
     click.echo("")
-    click.echo("[ ⚙ ] Configuration updated.")
+    click.secho("[ ⚙ ] Configuration updated.", fg='cyan')
     for option in options:
         if option == "all":
             set_all_values(False)
-            click.echo(":     All options → disabled.")
+            click.secho(":     All options →  disabled.", fg='green')
             break
 
         if option in config_data:
             set_config_value(option, False)
-            click.echo(f":     {full_name(option)} → disabled.")
+            click.secho(f":     {full_name(option)} →  disabled.", fg='green')
         else:
-            click.echo(f":     {option} → not found.")
+            click.secho(f":     {option} →  not found.", fg='red')
     click.echo("")
 
 
@@ -170,16 +171,17 @@ def config():
     vault_data = json.loads(VAULT_FILE.read_text())
 
     click.echo("")
-    click.echo("[ ⚙ ] Configuration:")
+    click.secho("[ ⚙ ] Configuration:", fg='cyan')
     for name, value in config_data.items():
         symbol = "✓" if value else "✗"
-        click.echo(f"  {symbol}   {full_name(name)}")
+        click.secho(f'  {symbol}   ', fg='white', nl=False)
+        click.secho(f'{full_name(name)}', fg='bright_black')
     click.echo("")
-    click.echo(f"[ {len(vault_data)} ] Passwords in vault.")
+    click.secho(f"[ {len(vault_data)} ] Passwords in vault.", fg='bright_black')
     if not KEY_FILE.exists():
-        click.echo("[ ✗ ] Key not activated.")
+        click.secho("[ ✗ ] Key not activated.", fg='red')
     else:
-        click.echo("[ ✓ ] Key activated.")
+        click.secho("[ ✓ ] Key activated.", fg='green')
     click.echo("")
 
 
@@ -191,11 +193,11 @@ def keygen():
     if not KEY_FILE.exists():
         generate_key()
         click.echo("")
-        click.echo("[ ✓ ] Cryptgraphic key succefully generated.")
+        click.secho("[ ✓ ] Cryptgraphic key succefully generated.", fg='green')
         click.echo("")
     else:
         click.echo("")
-        click.echo("[ ✗ ] Cryptgraphic key already exists.")
+        click.secho("[ ✗ ] Cryptgraphic key already exists.", fg='red')
         click.echo("")
 
 
@@ -206,21 +208,33 @@ def generate(name):
     """Generate new password."""
     create_password(name)
     click.echo("")
-    click.echo("[ ✓ ] Password created!")
-    click.echo(f":     {name} allocated in your vault.")
+    click.secho("[ ✓ ] Password created.", fg='green')
+    click.secho(f":     {name} allocated in your vault.", fg='bright_black')
     click.echo("")
 
 
 @passtw.command()
 @require_init
 @click.argument("name")
-def get(name):
+@click.option('--copy', '-c', is_flag=True, help='Copy the selected password to clipboard.')
+def get(name, copy):
     """Get password from vault."""
     password = get_password(name)
-    click.echo("")
-    click.echo("[ ✓ ] Vault open!")
-    click.echo(f":     {name}: {password}")
-    click.echo("")
+    if copy:
+        pyperclip.copy(password)
+        click.echo("")
+        click.secho('[ ✓ ] ', fg='green', nl=False) 
+        click.secho(f'Passtword for {name} copied to clipboard.', fg='bright_black')
+        click.echo("")
+    else:
+        click.echo("")
+        click.secho('[ ✓ ] ', fg='green', nl=False)
+        click.secho('Vault unlocked succefully.', fg='bright_black')
+        click.secho(':     Service  : ', fg='bright_black', nl=False)
+        click.secho(f'{name}', fg='cyan', bold=True)
+        click.secho(':     Password : ', fg='bright_black', nl=False)
+        click.secho(f'{password}', fg='cyan', bold=True)
+        click.echo("")
 
 
 if __name__ == "__main__":
