@@ -12,6 +12,7 @@ class CryptoManager:
         else:
             self.vault_data = json.loads(VAULT_FILE.read_text())
 
+
     def _load_key(self):
         if KEY_FILE.exists():
             return KEY_FILE.read_bytes()
