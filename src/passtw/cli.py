@@ -120,18 +120,18 @@ def set(options):
     config_data = json.loads(CONFIG_FILE.read_text())
 
     click.echo("")
-    click.secho("[ ⚙ ] Configuration updated.", fg='bright_green')
+    click.secho("[ ⚙ ] Configuration updated.", fg='cyan')
     for option in options:
         if option == "all":
             set_all_values(True)
-            click.echo(":     All options →  enabled.")
+            click.secho(":     All options →  enabled.", fg='green')
             break
 
         if option in config_data:
             set_config_value(option, True)
-            click.echo(f":     {full_name(option)} →> enabled.")
+            click.secho(f":     {full_name(option)} →> enabled.", fg='green')
         else:
-            click.secho(f":     {option} →  not found.", fg='bright_red')
+            click.secho(f":     {option} →  not found.", fg='red')
     click.echo("")
 
 
@@ -146,18 +146,18 @@ def unset(options):
     config_data = json.loads(CONFIG_FILE.read_text())
 
     click.echo("")
-    click.secho("[ ⚙ ] Configuration updated.", fg='bright_green')
+    click.secho("[ ⚙ ] Configuration updated.", fg='cyan')
     for option in options:
         if option == "all":
             set_all_values(False)
-            click.echo(":     All options →  disabled.")
+            click.secho(":     All options →  disabled.", fg='green')
             break
 
         if option in config_data:
             set_config_value(option, False)
-            click.echo(f":     {full_name(option)} →  disabled.")
+            click.secho(f":     {full_name(option)} →  disabled.", fg='green')
         else:
-            click.secho(f":     {option} →  not found.", fg='bright_red')
+            click.secho(f":     {option} →  not found.", fg='red')
     click.echo("")
 
 
@@ -171,10 +171,11 @@ def config():
     vault_data = json.loads(VAULT_FILE.read_text())
 
     click.echo("")
-    click.echo("[ ⚙ ] Configuration:")
+    click.secho("[ ⚙ ] Configuration:", fg='cyan')
     for name, value in config_data.items():
         symbol = "✓" if value else "✗"
-        click.echo(f"  {symbol}   {full_name(name)}")
+        click.secho(f'  {symbol}   ', fg='white', nl=False)
+        click.secho(f'{full_name(name)}', fg='bright_black')
     click.echo("")
     click.secho(f"[ {len(vault_data)} ] Passwords in vault.", fg='bright_black')
     if not KEY_FILE.exists():
@@ -207,7 +208,7 @@ def generate(name):
     """Generate new password."""
     create_password(name)
     click.echo("")
-    click.secho("[ ✓ ] Password created!", fg='green')
+    click.secho("[ ✓ ] Password created.", fg='green')
     click.secho(f":     {name} allocated in your vault.", fg='bright_black')
     click.echo("")
 
@@ -222,13 +223,17 @@ def get(name, copy):
     if copy:
         pyperclip.copy(password)
         click.echo("")
-        click.secho(f"[ ✓ ] Passtword for {name} copied to clipboard!", fg='green')
-        click.secho(":     It will remain there until you copy something else.", fg='bright_black')
+        click.secho('[ ✓ ] ', fg='green', nl=False) 
+        click.secho(f'Passtword for {name} copied to clipboard.', fg='bright_black')
         click.echo("")
     else:
         click.echo("")
-        click.secho("[ ✓ ] Vault open!", fg='green')
-        click.secho(f":     {name}: {password}", fg='bright_cyan', bold=True)
+        click.secho('[ ✓ ] ', fg='green', nl=False)
+        click.secho('Vault unlocked succefully.', fg='bright_black')
+        click.secho(':     Service  : ', fg='bright_black', nl=False)
+        click.secho(f'{name}', fg='cyan', bold=True)
+        click.secho(':     Password : ', fg='bright_black', nl=False)
+        click.secho(f'{password}', fg='cyan', bold=True)
         click.echo("")
 
 
