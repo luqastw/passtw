@@ -4,6 +4,7 @@ import os
 import platform
 from click.exceptions import ClickException
 import pyperclip
+
 from pathlib import Path
 from functools import wraps
 from passtw.keygen import generate_key
