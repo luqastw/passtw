@@ -1,4 +1,5 @@
 data/
+dist/
 *.key
 *.db
 vault.json

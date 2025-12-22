@@ -2,7 +2,9 @@ import click
 import json
 import os
 import platform
+import click
 import pyperclip
+
 from pathlib import Path
 from functools import wraps
 from passtw.keygen import generate_key
@@ -63,7 +65,7 @@ def run_init():
     f.parent.mkdir(parents=True, exist_ok=True)
     f.write_text(json.dumps({"initialized": True}, indent=4))
     click.echo("")
-    click.secho("[ ⏻ ] Succefully initialized!", fg='bright_green')
+    click.secho("[ ⏻ ] Succefully initialized!", fg='green')
     click.echo("")
 
 
@@ -163,7 +165,7 @@ def unset(options):
 
 @passtw.command()
 @require_init
-def config():
+def conf():
     """Show actual configuration."""
 
     ensure_vault()
@@ -204,7 +206,7 @@ def keygen():
 @passtw.command()
 @require_init
 @click.argument("name")
-def generate(name):
+def gen(name):
     """Generate new password."""
     create_password(name)
     click.echo("")
@@ -212,6 +214,20 @@ def generate(name):
     click.secho(f":     {name} allocated in your vault.", fg='bright_black')
     click.echo("")
 
+@passtw.command()
+@require_init
+def ls():
+    """Lists all passwords saved in vault."""
+    vault_data = json.loads(VAULT_FILE.read_text())
+    if not vault_data.keys():
+        click.secho('[ ✗  ] No password found.', fg='red')
+    else:
+        keys = sorted(list(vault_data.keys()))
+
+        click.echo('')
+        click.secho('[ ! ] Passwords found:', fg='bright_black')
+        for key in keys:
+            click.secho(f':     {key}', fg='cyan')
 
 @passtw.command()
 @require_init
@@ -235,6 +251,33 @@ def get(name, copy):
         click.secho(':     Password : ', fg='bright_black', nl=False)
         click.secho(f'{password}', fg='cyan', bold=True)
         click.echo("")
+
+
+@passtw.command()
+@require_init
+@click.argument("name")
+def rm(name):
+    """Remove password from vault."""
+    if not VAULT_FILE.exists():
+        raise click.ClickException('[ ✖  ] Vault not found.')
+    else:
+        vault_data = json.loads(VAULT_FILE.read_text())
+        if not name in vault_data:
+            raise click.ClickException('[ ✖  ] Password not found.')
+        else:
+            try:
+                click.confirm(f'[ ! ] Are you sure you want do delete {name}?', abort=True)
+                del vault_data[name]
+                VAULT_FILE.write_text(json.dumps(vault_data, indent=4))
+
+                click.echo('')
+                click.secho('[ ✓ ] ', fg='green', nl=False)
+                click.secho(f'Password for {name} deleted.', fg='bright_black')
+                click.echo('')
+            except:
+                click.echo('')
+                click.secho(f'[ ✖ ] Process canceled.', fg='red')
+                click.echo('')
 
 
 if __name__ == "__main__":

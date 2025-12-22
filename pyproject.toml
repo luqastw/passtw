@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "passtw"
-version = "1.0.0"
+version = "1.2.0"
 description = "One-command-line password generator + encrypted local vault. Minimal, secure and easy-to-use CLI tool in Python."
 authors = ["luqastw lucasborcem1@gmail.com"]
 readme = "README.md"
