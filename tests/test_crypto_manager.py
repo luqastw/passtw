@@ -1,5 +1,4 @@
-import json
-import pytest
+import json import pytest
 from unittest.mock import patch, MagicMock
 from cryptography.fernet import Fernet
 from click import ClickException
