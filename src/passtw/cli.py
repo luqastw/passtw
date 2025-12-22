@@ -2,7 +2,7 @@ import click
 import json
 import os
 import platform
-from click.exceptions import ClickException
+import click
 import pyperclip
 
 from pathlib import Path
@@ -94,7 +94,7 @@ def require_init(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         if not is_initialized():
-            raise ClickException("[ ✖ ] Type 'passtw init' to start.")
+            raise click.ClickException("[ ✖ ] Type 'passtw init' to start.")
         return f(*args, **kwargs)
 
     return wrapper
@@ -259,11 +259,11 @@ def get(name, copy):
 def rm(name):
     """Remove password from vault."""
     if not VAULT_FILE.exists():
-        raise ClickException('[ ✖  ] Vault not found.')
+        raise click.ClickException('[ ✖  ] Vault not found.')
     else:
         vault_data = json.loads(VAULT_FILE.read_text())
         if not name in vault_data:
-            raise ClickException('[ ✖  ] Password not found.')
+            raise click.ClickException('[ ✖  ] Password not found.')
         else:
             try:
                 click.confirm(f'[ ! ] Are you sure you want do delete {name}?', abort=True)
