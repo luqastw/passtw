@@ -10,125 +10,142 @@ function Start-Loader {
 
     $script:loaderJob = Start-ThreadJob -ScriptBlock {
         param($Message)
-        while ($true) {
-            Write-Host "`r$Message... " -NoNewline
-            Start-Sleep -Milliseconds 300
-            Write-Host "`r$Message..  " -NoNewline
-            Start-Sleep -Milliseconds 300
-            Write-Host "`r$Message.   " -NoNewline
-            Start-Sleep -Milliseconds 300
+$ErrorActionPreference = "Stop"
+$LogFile = "install.log"
+$host.UI.RawUI.WindowTitle = "Installer"
+
+if (Test-Path $LogFile) { Remove-Item $LogFile -Force }
+
+function Invoke-WithSpinner {
+    param (
+        [string]$Message,
+        [ScriptBlock]$Action
+    )
+
+    $spins = "|", "/", "-", "\"
+    $spinIndex = 0
+    
+    $job = Start-Job -ScriptBlock $Action
+    
+    [Console]::CursorVisible = $false
+    
+    try {
+        while ($job.State -eq 'Running') {
+            $spinChar = $spins[$spinIndex % $spins.Count]
+            Write-Host -NoNewline " [$spinChar] $Message"
+            
+            Start-Sleep -Milliseconds 100
+            
+            $cursorPos = [Console]::CursorLeft
+            if ($cursorPos -gt 0) {
+                [Console]::SetCursorPosition(0, [Console]::CursorTop)
+            }
+            
+            $spinIndex++
         }
-    } -ArgumentList $Message
-}
+        
+        $results = Receive-Job $job
+        $results | Out-File $LogFile -Append -Encoding UTF8
+        
+        Write-Host (" " * 60) -NoNewline
+        [Console]::SetCursorPosition(0, [Console]::CursorTop)
 
-function Stop-Loader {
-    if ($script:loaderRunning -and $script:loaderJob) {
-        Stop-Job $script:loaderJob -ErrorAction SilentlyContinue | Out-Null
-        Remove-Job $script:loaderJob -ErrorAction SilentlyContinue | Out-Null
+        return $job.ChildJobs[0].ExitCode
     }
-
-    Write-Host "`r`e[2K" -NoNewline
-
-    $script:loaderRunning = $false
-    $script:loaderJob = $null
-}
-
-function Run-Silent {
-    param([scriptblock]$cmd)
-    & $cmd *> $null 2>&1
-    return $?
+    finally {
+        [Console]::CursorVisible = $true
+        Remove-Job $job -Force
+    }
 }
 
 Clear-Host
+Write-Host @"
+▐▀▘ ▜▘▙ ▌▞▀▖▀▛▘▞▀▖▌  ▌  ▞▀▖▀▛▘▜▘▞▀▖▙ ▌ ▀▜ 
+▐   ▐ ▌▌▌▚▄  ▌ ▙▄▌▌  ▌  ▙▄▌ ▌ ▐ ▌ ▌▌▌▌  ▐ 
+▐   ▐ ▌▝▌▖ ▌ ▌ ▌ ▌▌  ▌  ▌ ▌ ▌ ▐ ▌ ▌▌▝▌  ▐ 
+▝▀▘ ▀▘▘ ▘▝▀  ▘ ▘ ▘▀▀▘▀▀▘▘ ▘ ▘ ▀▘▝▀ ▘ ▘ ▀▀ 
+"@ -ForegroundColor Cyan
 
-Write-Host "
+Write-Host "`nChoose your operational system:"
+Write-Host "[ 1 ] Linux"
+Write-Host "[ 2 ] MacOS"
+Write-Host "[ 3 ] Windows"
+$option = Read-Host "> "
+
+$RealOS = if ($IsWindows -or $env:OS -match "Windows") { "Windows" } else { "Unix-like" }
+$TargetOS = ""
+
+switch ($option) {
+    "1" { $TargetOS = "Linux" }
+    "2" { $TargetOS = "MacOS" }
+    "3" { $TargetOS = "Windows" }
+    Default {
+        Write-Host "[ ✖ ] Invalid option." -ForegroundColor Red
+        exit 1
+    }
+}
+
+if ($TargetOS -ne "Windows") {
+    Write-Host "[ ! ] Warning: You chose $TargetOS but you are on Windows." -ForegroundColor Yellow
+    $confirm = Read-Host "Continue anyway? (y/n)"
+    if ($confirm -notmatch "^[Yy]") { exit 1 }
+}
+
+Clear-Host
+Write-Host @"
 ▐▀▘ ▛▀▖▛▀▖▞▀▖▞▀▖▛▀▘▞▀▖▞▀▖▜▘▙ ▌▞▀▖ ▀▜ 
 ▐   ▙▄▘▙▄▘▌ ▌▌  ▙▄ ▚▄ ▚▄ ▐ ▌▌▌▌▄▖  ▐ 
 ▐   ▌  ▌▚ ▌ ▌▌ ▖▌  ▖ ▌▖ ▌▐ ▌▝▌▌ ▌  ▐ 
-▝▀▘ ▘  ▘ ▘▝▀ ▝▀ ▀▀▘▝▀ ▝▀ ▀▘▘ ▘▝▀  ▀▀ "
-Write-Host ""
-Write-Host "Installing passtw for Windows."
-Write-Host ""
+▝▀▘ ▘  ▘ ▘▝▀ ▝▀ ▀▀▘▝▀ ▝▀ ▀▘▘ ▘▝▀  ▀▀ 
+"@ -ForegroundColor Cyan
 
-Start-Loader "Detecting Python"
+Write-Host "`n[ ✓ ] Target: $TargetOS" -ForegroundColor Cyan
 
-$python = Get-Command python -ErrorAction SilentlyContinue
-if (-not $python) {
-    $python = Get-Command python3 -ErrorAction SilentlyContinue
+Start-Sleep -Seconds 1
+Invoke-WithSpinner "Detecting Python..." { Start-Sleep -Milliseconds 500 } | Out-Null
+
+if (Get-Command "python" -ErrorAction SilentlyContinue) {
+    $PY = "python"
+} elseif (Get-Command "python3" -ErrorAction SilentlyContinue) {
+    $PY = "python3"
+} else {
+    Write-Host "[ ✖ ] Python not found." -ForegroundColor Red
+    Write-Host "Check $LogFile for details."
+    exit 1
 }
+Write-Host "[ ✓ ] Python found ($PY)" -ForegroundColor Green
 
-if (-not $python) {
-    Stop-Loader
-    Write-Host "ERROR: Python not found."
+Start-Sleep -Seconds 1
+Invoke-WithSpinner "Detecting pipx..." { Start-Sleep -Milliseconds 500 } | Out-Null
+
+if (Get-Command "pipx" -ErrorAction SilentlyContinue) {
+    Write-Host "[ ✓ ] pipx found" -ForegroundColor Green
+} else {
+    Write-Host "[ ✖ ] pipx not found." -ForegroundColor Red
+    Write-Host "Please install pipx first (e.g., winget install pipx)"
     exit 1
 }
 
-Stop-Loader
-Write-Host "Python detected."
-$PY = $python.Source
-
-Start-Loader "Detecting pipx"
-
-$pipx = Get-Command pipx -ErrorAction SilentlyContinue
-
-Stop-Loader
-
-if (-not $pipx) {
-    Write-Host "pipx not found. Installing..."
-
-    Start-Loader "Installing pipx"
-
-    Run-Silent { & $PY -m pip install --user pipx }
-    Run-Silent { & $PY -m pipx ensurepath }
-
-    Stop-Loader
-    Write-Host "pipx installed."
-
-    # Caminho real do pipx no Windows
-    $PipxBin = "$env:USERPROFILE\AppData\Roaming\Python\Scripts"
-    if (-not ($env:PATH -split ";" | Where-Object { $_ -eq $PipxBin })) {
-        $env:PATH += ";$PipxBin"
-    }
-
-    $pipx = Get-Command pipx -ErrorAction SilentlyContinue
-    if (-not $pipx) {
-        Write-Host "ERROR: pipx installation failed."
-        exit 1
-    }
-} else {
-    Write-Host "pipx detected."
+$ExitCode = Invoke-WithSpinner "Installing passtw v1.0.0..." {
+    pipx install . --force 2>&1
 }
 
-Start-Loader "Installing passtw"
-
-$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-
-# instala do diretório local
-Run-Silent { pipx install $ScriptDir --force }
-
-Stop-Loader
-
-# Teste final
-$passtwCheck = Get-Command passtw -ErrorAction SilentlyContinue
-if (-not $passtwCheck) {
-    Write-Host "WARNING: passtw not available in PATH in this session."
-    Write-Host "Try opening a new terminal OR run:"
-    Write-Host ""
-    Write-Host "    refreshenv"
-    Write-Host ""
-} else {
-    Write-Host "passtw detected."
-}
-
-Clear-Host
-Write-Host "
-██████╗  █████╗ ███████╗███████╗████████╗██╗    ██╗
+if ($ExitCode -eq 0 -or $LASTEXITCODE -eq 0) {
+    Clear-Host
+    Write-Host @"
+██████╗  █████╗ ███████╗████████╗███████╗██╗    ██╗
 ██╔══██╗██╔══██╗██╔════╝██╔════╝╚══██╔══╝██║    ██║
 ██████╔╝███████║███████╗███████╗   ██║   ██║ █╗ ██║
 ██╔═══╝ ██╔══██║╚════██║╚════██║   ██║   ██║███╗██║
 ██║     ██║  ██║███████║███████║   ██║   ╚███╔███╔╝
 ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝   ╚═╝    ╚══╝╚══╝ 
-"
-Write-Host "Installed successfully."
-Write-Host "Run passtw init to start."
-Write-Host ""
+"@ -ForegroundColor Green
+    
+    Write-Host "`n[ ✓ ] Successfully installed!" -ForegroundColor Green
+    Write-Host "Run 'passtw' to start." -ForegroundColor Yellow
+    Write-Host ""
+} else {
+    Write-Host "`n[ ✖ ] Installation FAILED." -ForegroundColor Red
+    Write-Host "Check the log file for errors: $LogFile"
+    Write-Host "Tip: Try running 'pipx uninstall passtw' and try again."
+}
