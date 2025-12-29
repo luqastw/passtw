@@ -6,7 +6,6 @@ One-command-line password generator + encrypted local vault. Minimal, secure and
   <img src="assets/demo.svg" alt="Demo da CLI" />
 </p>
 
-
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge\&logo=python\&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Build](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge)
@@ -15,7 +14,7 @@ One-command-line password generator + encrypted local vault. Minimal, secure and
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 
 * [Project Overview](#project-overview)
 * [Features](#features)
@@ -26,19 +25,18 @@ One-command-line password generator + encrypted local vault. Minimal, secure and
 * [Security & Vault](#security--vault)
 * [Project Structure](#project-structure)
 * [Tests & Quality](#tests--quality)
-* [Roadmap](#roadmap)
 * [Contribution](#contribution)
 * [License](#license)
 
 ---
 
-## 📖 Project Overview
+## Project Overview
 
 passtw is a secure, minimalistic, and configurable command-line tool for generating and storing passwords locally in an encrypted vault. Designed for developers and sysadmins, it runs seamlessly on Linux, macOS, and Windows.
 
 ---
 
-## 🚀 Features
+## Features
 
 * Generate secure random passwords;
 * Encrypted local vault storage (AES-128);
@@ -51,7 +49,7 @@ passtw is a secure, minimalistic, and configurable command-line tool for generat
 
 ---
 
-## 📦 Requirements & Dependencies
+## Requirements & Dependencies
 
 * Python 3.10+;
 * pip and pipx;
@@ -59,7 +57,7 @@ passtw is a secure, minimalistic, and configurable command-line tool for generat
 
 ---
 
-## 📥 Installation
+## Installation
 
 ### Linux / macOS
 
@@ -79,43 +77,63 @@ cd passtw
 
 ---
 
-## 🕹 Usage / CLI Commands
+## Usage / CLI Commands
 
-### Generate a new password:
+### Generate a new password
 
 ```bash
-passtw generate
+passtw gen {password name}
 ```
 
-### Get a password from vault:
+### Get a password from vault
 
 ```bash
 passtw get {password name}
 ```
 
-### Set password policy options:
+#### Include -c or --copy to copy to clipboard
+
+### Remove a password from vault
+
+```bash
+passtw rm {password name}
+```
+
+### Lists all passwords in vault
+
+```bash
+passtw ls
+```
+
+### Set password policy options
 
 ```bash
 passtw set {option}
 ```
 
-### Unset password policy options:
+### Unset password policy options
 
 ```bash
 passtw unset {option}
 ```
 
-### Show actual configuration:
+### Generate a new cryptographic key
 
 ```bash
-passtw config
+passtw keygen
+```
+
+### Show actual configuration
+
+```bash
+passtw conf
 ```
 
 Use `passtw --help` for all available commands and options.
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 * Configuration is stored locally in JSON format.
 * You can adjust password inclusion of symbols, numbers, and other parameters.
@@ -123,7 +141,7 @@ Use `passtw --help` for all available commands and options.
 
 ---
 
-## 🔐 Security & Vault
+## Security & Vault
 
 * Passwords are stored in an encrypted local vault using AES-128.
 * Keys are generated and managed internally by the `keygen` module.
@@ -132,7 +150,7 @@ Use `passtw --help` for all available commands and options.
 
 ---
 
-## 🧰 Project Structure
+## Project Structure
 
 ```
 src/
@@ -153,30 +171,19 @@ install.sh / install.ps1
 
 ---
 
-## 🧪 Tests & Quality
+## Tests & Quality
 
 Run automated tests with:
 
 ```bash
-pytest -v
+make test
 ```
 
 All critical modules including password generation, encryption/decryption, and configuration management are tested.
 
 ---
 
-## 🗺 Roadmap / Planned Features
-
-* Multiple vaults / profiles for different projects;
-* Secure backup / export of vault;
-* Interactive TUI interface with enhanced UX;
-* Integration with clipboard for secure password copy;
-* Password strength estimation and recommendations;
-* Packaging and release via PyPI.
-
----
-
-## 👨‍💻 Contribution
+## Contribution
 
 * Fork the repository;
 * Create a feature branch (`git checkout -b feature/my-feature`);
@@ -188,6 +195,6 @@ Please follow the existing code style and write tests for new features.
 
 ---
 
-## 📄 License
+## License
 
 MIT License.
