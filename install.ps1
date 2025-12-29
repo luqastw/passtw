@@ -126,7 +126,7 @@ if (Get-Command "pipx" -ErrorAction SilentlyContinue) {
     exit 1
 }
 
-$ExitCode = Invoke-WithSpinner "Installing passtw v1.0.0..." {
+$ExitCode = Invoke-WithSpinner "Installing passtw v1.2.1..." {
     pipx install . --force 2>&1
 }
 
