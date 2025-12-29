@@ -3,7 +3,7 @@
 One-command-line password generator + encrypted local vault. Minimal, secure and easy-to-use CLI tool in Python.
 
 <p align="center">
-  <img src="assets/demo.svg" alt="Demo da CLI" />
+  <img src="https://asciinema.org/a/iJ7haAGnaBuJJ3eGi8ZriWuLn.svg" alt="Demo" />
 </p>
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge\&logo=python\&logoColor=white)
@@ -91,7 +91,7 @@ passtw gen {password name}
 passtw get {password name}
 ```
 
-#### Include -c or --copy to copy to clipboard
+##### Include -c or --copy to copy to clipboard
 
 ### Remove a password from vault
 
