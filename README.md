@@ -2,10 +2,6 @@
 
 One-command-line password generator + encrypted local vault. Minimal, secure and easy-to-use CLI tool in Python.
 
-<p align="center">
-  <img src="https://asciinema.org/a/iJ7haAGnaBuJJ3eGi8ZriWuLn.svg" alt="Demo" />
-</p>
-
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge\&logo=python\&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Build](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge)
