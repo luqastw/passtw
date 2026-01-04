@@ -116,7 +116,7 @@ fi
 
 (run_safe pipx install . --force) &
 PID_INSTALL=$!
-loader "Installing passtw v1.0.0..."
+loader "Installing passtw v1.2.1..."
 wait $PID_INSTALL
 EXIT_CODE=$?
 
@@ -139,4 +139,3 @@ else
   echo "Check the log file for errors: $LOG_FILE"
   echo "Tip: Try running 'pipx uninstall passtw' and try again."
 fi
-
