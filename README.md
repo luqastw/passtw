@@ -87,7 +87,7 @@ passtw gen {password name}
 passtw get {password name}
 ```
 
-##### Include -c or --copy to copy to clipboard
+###### Include -c or --copy to copy to clipboard
 
 ### Remove a password from vault
 
