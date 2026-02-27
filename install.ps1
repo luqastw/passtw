@@ -46,7 +46,7 @@ Write-Host "`nChoose your operational system:"
 Write-Host "[ 1 ] Linux"
 Write-Host "[ 2 ] MacOS"
 Write-Host "[ 3 ] Windows"
-$option = Read-Host "> "
+$option = Read-Host ">  "
 
 switch ($option) {
     "1" { $TargetOS = "Linux" }
