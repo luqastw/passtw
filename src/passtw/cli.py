@@ -1,7 +1,7 @@
-import click 
 import json
 import os
 import platform
+
 import click
 import pyperclip
 
@@ -89,8 +89,6 @@ def set_all_values(value: bool):
 
 
 def require_init(f):
-    """Blocks any command until it's not initialized."""
-
     @wraps(f)
     def wrapper(*args, **kwargs):
         if not is_initialized():

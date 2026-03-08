@@ -56,40 +56,28 @@ class TestPasswordGenerator:
         assert len(password) == 16
 
     def test_secure_shuffle_changes_order(self, mock_config_manager):
-        # Travamos a seed ou o pool para garantir que a diferença seja o shuffle
-        # Mas como a geração é aleatória, verificamos se não é ordenado
         gen = PasswordGenerator()
-        # Injeta manualmente para teste controlado
         gen.PASSWORD = ['a', 'b', 'c', 'd', 'e']
 
         shuffled = gen._secure_shuffle()
 
-        # Estatisticamente é muito provável que mude, mas em testes unitários
-        # focamos que o método retorna string e tem o mesmo tamanho e conteúdo
         assert len(shuffled) == 5
         assert sorted(shuffled) == ['a', 'b', 'c', 'd', 'e']
         assert isinstance(shuffled, str)
 
 @patch("passtw.generator.crypt_generated")
 def test_create_password_flow(mock_crypt, mock_config_manager):
-    # Testamos a função helper 'create_password'
-    # Ela deve instanciar o generator, gerar a senha e chamar o crypt
-
     service_name = "netflix"
     create_password(service_name)
 
     mock_crypt.assert_called_once()
 
-    # Verifica os argumentos passados para o crypt_generated
     args, _ = mock_crypt.call_args
     assert args[0] == service_name
-    assert len(args[1]) == 16  # A senha gerada passada como segundo arg
+    assert len(args[1]) == 16
 
 @patch("passtw.generator.CryptoManager")
 def test_get_password_flow(MockCryptoClass):
-    # Testamos a função helper 'get_password'
-    # Ela deve instanciar o CryptoManager e chamar read_password
-
     mock_instance = MockCryptoClass.return_value
     mock_instance.read_password.return_value = "senha_secreta_retornada"
 
